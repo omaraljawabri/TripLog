@@ -1,0 +1,46 @@
+package entities;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+public class Restaurante extends Atividade{
+    private static int id;
+    private String nomeRestaurante;
+    private String culinaria;
+    private String prato;
+
+    public Restaurante(String nome, List<Gasto> gastos, LocalDateTime horario, String nomeRestaurante, String culinaria, String prato) {
+        super(nome, gastos, horario);
+        Restaurante.id++;
+        this.nomeRestaurante = nomeRestaurante;
+        this.culinaria = culinaria;
+        this.prato = prato;
+    }
+
+    public Restaurante() {
+    }
+
+    public String getNomeRestaurante() {
+        return nomeRestaurante;
+    }
+
+    public void setNomeRestaurante(String nomeRestaurante) {
+        this.nomeRestaurante = nomeRestaurante;
+    }
+
+    public String getCulinaria() {
+        return culinaria;
+    }
+
+    public void setCulinaria(String culinaria) {
+        this.culinaria = culinaria;
+    }
+
+    public String getPrato() {
+        return prato;
+    }
+
+    public void setPrato(String prato) {
+        this.prato = prato;
+    }
+}
