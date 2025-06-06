@@ -1,17 +1,20 @@
 package entities;
 
 public class Hospedagem {
-    private static int id;
+    private static int contador;
+    private int id;
     private String nomeLocalHospedagem;
     private int numeroDeNoites;
     private double valorDiaria;
 
     public Hospedagem(){
-        Hospedagem.id++;
+        Hospedagem.contador++;
+        this.id = Hospedagem.contador;
     }
 
     public Hospedagem(String nomeLocalHospedagem, int numeroDeNoites, double valorDiaria) {
-        Hospedagem.id++;
+        Hospedagem.contador++;
+        this.id = Hospedagem.contador;
         this.nomeLocalHospedagem = nomeLocalHospedagem;
         this.numeroDeNoites = numeroDeNoites;
         this.valorDiaria = valorDiaria;

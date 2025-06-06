@@ -3,7 +3,8 @@ package entities;
 import java.util.List;
 
 public class Viagem {
-    private static int id;
+    private static int contador;
+    private int id;
     private String lugarDePartida;
     private String lugarDeChegada;
     private List<Deslocamento> deslocamentos;
@@ -14,11 +15,13 @@ public class Viagem {
     private List<Atividade> atividades;
 
     public Viagem() {
-        Viagem.id++;
+        Viagem.contador++;
+        this.id = Viagem.contador;
     }
 
     public Viagem(String lugarDePartida, String lugarDeChegada, List<Deslocamento> deslocamentos, List<Hospedagem> hospedagens, double saldo, int diasPercorridos, String companhia, List<Atividade> atividades) {
-        Viagem.id++;
+        Viagem.contador++;
+        this.id = Viagem.contador;
         this.lugarDePartida = lugarDePartida;
         this.lugarDeChegada = lugarDeChegada;
         this.deslocamentos = deslocamentos;

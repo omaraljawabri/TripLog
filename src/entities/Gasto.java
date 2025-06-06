@@ -1,16 +1,19 @@
 package entities;
 
 public class Gasto {
-    private static int id;
+    private int id;
+    private static int contador;
     private double valor;
     private String tipo;
 
     public Gasto(){
-        Gasto.id++;
+        Gasto.contador++;
+        this.id = Gasto.contador;
     }
 
     public Gasto(double valor, String tipo) {
-        Gasto.id++;
+        Gasto.contador++;
+        this.id = Gasto.contador;
         this.valor = valor;
         this.tipo = tipo;
     }

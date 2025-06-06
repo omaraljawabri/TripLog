@@ -4,20 +4,24 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class Restaurante extends Atividade{
-    private static int id;
+    private static int contador;
+    private int id;
     private String nomeRestaurante;
     private String culinaria;
     private String prato;
 
     public Restaurante(String nome, List<Gasto> gastos, LocalDateTime horario, String nomeRestaurante, String culinaria, String prato) {
         super(nome, gastos, horario);
-        Restaurante.id++;
+        Restaurante.contador++;
+        this.id = Restaurante.contador;
         this.nomeRestaurante = nomeRestaurante;
         this.culinaria = culinaria;
         this.prato = prato;
     }
 
     public Restaurante() {
+        Restaurante.contador++;
+        this.id = Restaurante.contador;
     }
 
     public String getNomeRestaurante() {

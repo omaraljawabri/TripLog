@@ -4,18 +4,21 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class Viajante {
-    private static int id;
+    private static int contador;
+    private int id;
     private String nome;
     private String senha;
     private LocalDate dataDeNascimento;
     private List<Viagem> viagens;
 
     public Viajante() {
-        Viajante.id++;
+        Viajante.contador++;
+        this.id = Viajante.contador;
     }
 
     public Viajante(String nome, String senha, LocalDate dataDeNascimento, List<Viagem> viagens) {
-        Viajante.id++;
+        Viajante.contador++;
+        this.id = Viajante.contador;
         this.nome = nome;
         this.senha = senha;
         this.dataDeNascimento = dataDeNascimento;

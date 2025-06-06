@@ -1,16 +1,19 @@
 package entities;
 
 public class Deslocamento {
-    private static int id;
+    private int id;
+    private static int contador = 0;
     private String meioDeTransporte;
     private double custo;
 
     public Deslocamento(){
-        Deslocamento.id++;
+        Deslocamento.contador++;
+        this.id = Deslocamento.contador;
     }
 
     public Deslocamento(String meioDeTransporte, double custo) {
-        Deslocamento.id++;
+        Deslocamento.contador++;
+        this.id = Deslocamento.contador;
         this.meioDeTransporte = meioDeTransporte;
         this.custo = custo;
     }
