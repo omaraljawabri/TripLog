@@ -1,6 +1,8 @@
 package entities;
 
-public class Hospedagem {
+import java.io.Serializable;
+
+public class Hospedagem implements Serializable {
     private static int contador;
     private int id;
     private String nomeLocalHospedagem;
@@ -18,6 +20,10 @@ public class Hospedagem {
         this.nomeLocalHospedagem = nomeLocalHospedagem;
         this.numeroDeNoites = numeroDeNoites;
         this.valorDiaria = valorDiaria;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getNomeLocalHospedagem() {
@@ -42,5 +48,15 @@ public class Hospedagem {
 
     public void setValorDiaria(double valorDiaria) {
         this.valorDiaria = valorDiaria;
+    }
+
+    @Override
+    public String toString() {
+        return "Hospedagem{" +
+                "id=" + id +
+                ", nomeLocalHospedagem='" + nomeLocalHospedagem + '\'' +
+                ", numeroDeNoites=" + numeroDeNoites +
+                ", valorDiaria=" + valorDiaria +
+                '}';
     }
 }

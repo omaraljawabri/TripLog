@@ -1,9 +1,10 @@
 package entities;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class Passeio extends Atividade{
+public class Passeio extends Atividade implements Serializable {
     private static int contador;
     private int id;
     private String nomeLocal;
@@ -20,11 +21,23 @@ public class Passeio extends Atividade{
         this.nomeLocal = nomeLocal;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public String getNomeLocal() {
         return nomeLocal;
     }
 
     public void setNomeLocal(String nomeLocal) {
         this.nomeLocal = nomeLocal;
+    }
+
+    @Override
+    public String toString() {
+        return "Passeio{" +
+                "id=" + id +
+                ", nomeLocal='" + nomeLocal + '\'' +
+                '}';
     }
 }

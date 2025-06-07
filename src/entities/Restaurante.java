@@ -1,9 +1,10 @@
 package entities;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class Restaurante extends Atividade{
+public class Restaurante extends Atividade implements Serializable {
     private static int contador;
     private int id;
     private String nomeRestaurante;
@@ -22,6 +23,10 @@ public class Restaurante extends Atividade{
     public Restaurante() {
         Restaurante.contador++;
         this.id = Restaurante.contador;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getNomeRestaurante() {
@@ -46,5 +51,15 @@ public class Restaurante extends Atividade{
 
     public void setPrato(String prato) {
         this.prato = prato;
+    }
+
+    @Override
+    public String toString() {
+        return "Restaurante{" +
+                "id=" + id +
+                ", nomeRestaurante='" + nomeRestaurante + '\'' +
+                ", culinaria='" + culinaria + '\'' +
+                ", prato='" + prato + '\'' +
+                '}';
     }
 }
