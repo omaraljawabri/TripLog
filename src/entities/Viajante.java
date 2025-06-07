@@ -1,9 +1,12 @@
 package entities;
 
+import repositories.ViagemRepository;
+
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
-public class Viajante {
+public class Viajante implements Serializable {
     private static int contador;
     private int id;
     private String nome;
@@ -55,5 +58,12 @@ public class Viajante {
 
     public void setViagens(List<Viagem> viagens) {
         this.viagens = viagens;
+    }
+
+    public void adicionarViagem(Viagem viagem){
+        boolean resultado = ViagemRepository.salvarViagem(viagem);
+        if (!resultado){
+            throw new RuntimeException("Erro ao adicionar nova viagem");
+        }
     }
 }
