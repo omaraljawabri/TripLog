@@ -1,6 +1,8 @@
 package entities;
 
-public class Gasto {
+import java.io.Serializable;
+
+public class Gasto implements Serializable {
     private int id;
     private static int contador;
     private double valor;
@@ -18,6 +20,10 @@ public class Gasto {
         this.tipo = tipo;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public double getValor() {
         return valor;
     }
@@ -32,5 +38,14 @@ public class Gasto {
 
     public void setTipo(String tipo) {
         this.tipo = tipo;
+    }
+
+    @Override
+    public String toString() {
+        return "Gasto{" +
+                "id=" + id +
+                ", valor=" + valor +
+                ", tipo='" + tipo + '\'' +
+                '}';
     }
 }

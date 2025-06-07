@@ -1,6 +1,8 @@
 package entities;
 
-public class Deslocamento {
+import java.io.Serializable;
+
+public class Deslocamento implements Serializable {
     private int id;
     private static int contador = 0;
     private String meioDeTransporte;
@@ -18,6 +20,10 @@ public class Deslocamento {
         this.custo = custo;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public String getMeioDeTransporte() {
         return meioDeTransporte;
     }
@@ -32,5 +38,14 @@ public class Deslocamento {
 
     public void setCusto(double custo) {
         this.custo = custo;
+    }
+
+    @Override
+    public String toString() {
+        return "Deslocamento{" +
+                "id=" + id +
+                ", meioDeTransporte='" + meioDeTransporte + '\'' +
+                ", custo=" + custo +
+                '}';
     }
 }

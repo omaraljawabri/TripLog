@@ -1,8 +1,9 @@
 package entities;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Viagem {
+public class Viagem implements Serializable {
     private static int contador;
     private int id;
     private String lugarDePartida;
@@ -30,6 +31,10 @@ public class Viagem {
         this.diasPercorridos = diasPercorridos;
         this.companhia = companhia;
         this.atividades = atividades;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getLugarDePartida() {
@@ -94,5 +99,21 @@ public class Viagem {
 
     public void setAtividades(List<Atividade> atividades) {
         this.atividades = atividades;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Viagem{" +
+                "id=" + id +
+                ", lugarDePartida='" + lugarDePartida + '\'' +
+                ", lugarDeChegada='" + lugarDeChegada + '\'' +
+                ", deslocamentos=" + deslocamentos +
+                ", hospedagens=" + hospedagens +
+                ", saldo=" + saldo +
+                ", diasPercorridos=" + diasPercorridos +
+                ", companhia='" + companhia + '\'' +
+                ", atividades=" + atividades +
+                '}';
     }
 }
