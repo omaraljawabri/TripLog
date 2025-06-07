@@ -1,5 +1,7 @@
 package entities;
 
+import exceptions.EntityNotFoundException;
+import exceptions.ValidationException;
 import repositories.ViagemRepository;
 
 import java.io.Serializable;
@@ -60,10 +62,41 @@ public class Viajante implements Serializable {
         this.viagens = viagens;
     }
 
-    public void adicionarViagem(Viagem viagem){
-        boolean resultado = ViagemRepository.salvarViagem(viagem);
+    public void adicionarViagem(Viagem v){
+        if (v.getLugarDePartida() == null || v.getLugarDeChegada() == null || v.getDeslocamentos().isEmpty()
+        || v.getHospedagens().isEmpty() || v.getAtividades().isEmpty()){
+            throw new ValidationException("Atributos lugar de partida, lugar de chegada, deslocamentos, hospedagens e atividades devem ser preenchidos");
+        }
+        boolean resultado = ViagemRepository.salvarViagem(v);
         if (!resultado){
             throw new RuntimeException("Erro ao adicionar nova viagem");
+        }
+    }
+
+    public List<Viagem> listarViagens(){
+        return ViagemRepository.buscarTodasViagens();
+    }
+
+    public Viagem buscarViagemPorId(int id){
+        Viagem viagem = ViagemRepository.buscarViagemPorId(id);
+        if (viagem == null){
+            throw new EntityNotFoundException("Viagem com id: "+id+", não encontrada!");
+        }
+        System.out.println(viagem);
+        return viagem;
+    }
+
+    public void removerViagem(int id){
+        boolean isRemovido = ViagemRepository.removerViagemPorId(id);
+        if (!isRemovido){
+            throw new EntityNotFoundException("Viagem com id: "+id+", não encontrada");
+        }
+    }
+
+    public void editarViagem(int id, Viagem viagem){
+        boolean isEditada = ViagemRepository.editarViagemPorId(id, viagem);
+        if (!isEditada){
+            throw new EntityNotFoundException("Viagem com id: "+id+", não encontrada");
         }
     }
 }
