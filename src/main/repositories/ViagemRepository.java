@@ -13,10 +13,14 @@ import java.util.List;
 
 public class ViagemRepository {
 
-    private static final String CAMINHO_ARQUIVO = "Viagem.ser";
+    private String caminhoArquivo;
 
-    public static boolean salvarViagem(Viagem v){
-        Path path = Paths.get(CAMINHO_ARQUIVO);
+    public ViagemRepository(String caminhoArquivo){
+        this.caminhoArquivo = caminhoArquivo;
+    }
+
+    public boolean salvarViagem(Viagem v){
+        Path path = Paths.get(caminhoArquivo);
         List<Viagem> viagens = buscarTodasViagens();
         viagens.add(v);
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(Files.newOutputStream(path))) {
@@ -27,8 +31,8 @@ public class ViagemRepository {
         }
     }
 
-    public static boolean salvarViagens(List<Viagem> viagens){
-        Path path = Paths.get(CAMINHO_ARQUIVO);
+    public boolean salvarViagens(List<Viagem> viagens){
+        Path path = Paths.get(caminhoArquivo);
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(Files.newOutputStream(path))) {
             objectOutputStream.writeObject(viagens);
             return true;
@@ -37,8 +41,8 @@ public class ViagemRepository {
         }
     }
 
-    public static List<Viagem> buscarTodasViagens(){
-        Path path = Paths.get(CAMINHO_ARQUIVO);
+    public List<Viagem> buscarTodasViagens(){
+        Path path = Paths.get(caminhoArquivo);
         if (!Files.exists(path)){
             return new ArrayList<>();
         }
@@ -50,7 +54,7 @@ public class ViagemRepository {
         }
     }
 
-    public static Viagem buscarViagemPorId(int id){
+    public Viagem buscarViagemPorId(int id){
         List<Viagem> viagens = buscarTodasViagens();
         List<Viagem> viagem = viagens.stream().filter(v -> v.getId() == id).toList();
         if (viagem.isEmpty()){
@@ -59,7 +63,7 @@ public class ViagemRepository {
         return viagem.getFirst();
     }
 
-    public static boolean removerViagemPorId(int id){
+    public boolean removerViagemPorId(int id){
         List<Viagem> viagens = buscarTodasViagens();
         boolean isRemovido = viagens.removeIf(v -> v.getId() == id);
         if (isRemovido){
@@ -69,7 +73,7 @@ public class ViagemRepository {
         }
     }
 
-    public static boolean editarViagemPorId(int id, Viagem viagemAtualizada){
+    public boolean editarViagemPorId(int id, Viagem viagemAtualizada){
         List<Viagem> viagens = buscarTodasViagens();
         for (int i = 0; i < viagens.size(); i++) {
             if (viagens.get(i).getId() == id){
