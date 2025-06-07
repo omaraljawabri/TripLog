@@ -1,6 +1,6 @@
-package repositories;
+package main.repositories;
 
-import entities.Viagem;
+import main.entities.Viagem;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

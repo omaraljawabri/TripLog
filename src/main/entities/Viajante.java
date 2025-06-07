@@ -1,8 +1,8 @@
-package entities;
+package main.entities;
 
-import exceptions.EntityNotFoundException;
-import exceptions.ValidationException;
-import repositories.ViagemRepository;
+import main.exceptions.EntityNotFoundException;
+import main.exceptions.ValidationException;
+import main.repositories.ViagemRepository;
 
 import java.io.Serializable;
 import java.time.LocalDate;
