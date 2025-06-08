@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="framesUI.CadastroFrame">
+  <grid id="27dc6" binding="plnContainerPrincipal" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="500" height="477"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <grid id="af1e5" binding="plnCenterUI" layout-manager="GridLayoutManager" row-count="5" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="10">
+        <margin top="50" left="50" bottom="50" right="50"/>
+        <constraints border-constraint="Center"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="41884" class="javax.swing.JLabel" binding="senhaLabel">
+            <constraints>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Senha"/>
+            </properties>
+          </component>
+          <component id="bda1f" class="javax.swing.JLabel" binding="emailLabel">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="E-mail "/>
+            </properties>
+          </component>
+          <component id="f334b" class="javax.swing.JTextField" binding="inputEmailCadastro">
+            <constraints>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+            </constraints>
+            <properties/>
+          </component>
+          <component id="8a0d8" class="javax.swing.JTextField" binding="inputConfirmarSenhaCadastro">
+            <constraints>
+              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+            </constraints>
+            <properties/>
+          </component>
+          <component id="cfeff" class="javax.swing.JLabel" binding="confirmarSenhaLabel">
+            <constraints>
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Confirmar Senha"/>
+            </properties>
+          </component>
+          <component id="18803" class="javax.swing.JTextField" binding="inputSenhaCadastro">
+            <constraints>
+              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="-1"/>
+              </grid>
+            </constraints>
+            <properties/>
+          </component>
+          <vspacer id="d3c27">
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </vspacer>
+          <vspacer id="243dd">
+            <constraints>
+              <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </vspacer>
+        </children>
+      </grid>
+      <grid id="33246" binding="plnButton" layout-manager="GridLayoutManager" row-count="2" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="20" left="20" bottom="20" right="20"/>
+        <constraints border-constraint="South"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="6d028" class="javax.swing.JButton" binding="telaDeLoginButton" default-binding="true">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Tela de Login"/>
+            </properties>
+          </component>
+          <component id="565a6" class="javax.swing.JLabel" binding="possuiContaLabel">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Já Possui uma Conta? Faça Login"/>
+            </properties>
+          </component>
+          <component id="a40e2" class="javax.swing.JButton" binding="cadastrarButton" default-binding="true">
+            <constraints>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Cadastrar"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="5f449" binding="plnHeader" layout-manager="BorderLayout" hgap="0" vgap="30">
+        <constraints border-constraint="North"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="7a799" class="javax.swing.JLabel" binding="sejaBemVindoLabel">
+            <constraints border-constraint="Center"/>
+            <properties>
+              <horizontalAlignment value="0"/>
+              <text value="Seja Bem Vindo!"/>
+            </properties>
+          </component>
+          <component id="226c0" class="javax.swing.JLabel" binding="telaDeCadastroLabel">
+            <constraints border-constraint="South"/>
+            <properties>
+              <horizontalAlignment value="0"/>
+              <text value="Tela De Cadastro"/>
+            </properties>
+          </component>
+          <vspacer id="d8d24">
+            <constraints border-constraint="North"/>
+          </vspacer>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>
