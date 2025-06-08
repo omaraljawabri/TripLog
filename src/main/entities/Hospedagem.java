@@ -50,6 +50,10 @@ public class Hospedagem implements Serializable {
         this.valorDiaria = valorDiaria;
     }
 
+    public double calculaTotal(){
+        return this.numeroDeNoites*this.valorDiaria;
+    }
+
     @Override
     public String toString() {
         return "Hospedagem{" +
