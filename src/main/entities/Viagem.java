@@ -14,6 +14,7 @@ public class Viagem implements Serializable {
     private int diasPercorridos;
     private String companhia;
     private List<Atividade> atividades;
+    private int idViajante;
 
     public Viagem() {
         Viagem.contador++;
@@ -31,6 +32,14 @@ public class Viagem implements Serializable {
         this.diasPercorridos = diasPercorridos;
         this.companhia = companhia;
         this.atividades = atividades;
+    }
+
+    public int getIdViajante() {
+        return idViajante;
+    }
+
+    public void setIdViajante(int idViajante) {
+        this.idViajante = idViajante;
     }
 
     public void setId(int id) {

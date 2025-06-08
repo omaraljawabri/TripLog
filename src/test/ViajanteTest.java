@@ -150,6 +150,8 @@ class ViajanteTest {
         Viagem viagem2 = criarViagem2();
         Viajante viajante = new Viajante("Fulano", "fulano123", LocalDate.of(2002, 12, 20), repository);
 
+        viagem.setIdViajante(viajante.getId());
+        viagem2.setIdViajante(viajante.getId());
         viajante.adicionarViagem(viagem);
 
         assertDoesNotThrow(() -> viajante.editarViagem(viagem.getId(), viagem2));
@@ -203,6 +205,7 @@ class ViajanteTest {
         viagem1.setAtividades(atividades1);
         viagem1.setSaldo(1000.0);
         viagem1.setDiasPercorridos(4);
+        viagem1.setIdViajante(1);
         return viagem1;
     }
 
@@ -238,6 +241,7 @@ class ViajanteTest {
         viagem2.setAtividades(atividades2);
         viagem2.setSaldo(800.0);
         viagem2.setDiasPercorridos(3);
+        viagem2.setIdViajante(1);
         return viagem2;
     }
 
@@ -272,6 +276,7 @@ class ViajanteTest {
         viagem3.setAtividades(atividades3);
         viagem3.setSaldo(1500.0);
         viagem3.setDiasPercorridos(5);
+        viagem3.setIdViajante(1);
         return viagem3;
     }
 }
