@@ -24,13 +24,12 @@ public class Viajante implements Serializable {
         this.viagemRepository = viagemRepository;
     }
 
-    public Viajante(String nome, String senha, LocalDate dataDeNascimento, List<Viagem> viagens, ViagemRepository viagemRepository) {
+    public Viajante(String nome, String senha, LocalDate dataDeNascimento, ViagemRepository viagemRepository) {
         Viajante.contador++;
         this.id = Viajante.contador;
         this.nome = nome;
         this.senha = senha;
         this.dataDeNascimento = dataDeNascimento;
-        this.viagens = viagens;
         this.viagemRepository = viagemRepository;
     }
 
@@ -86,21 +85,20 @@ public class Viajante implements Serializable {
         if (viagem == null){
             throw new EntityNotFoundException("Viagem com id: "+id+", não encontrada!");
         }
-        System.out.println(viagem);
         return viagem;
     }
 
     public void removerViagem(int id){
         boolean isRemovido = viagemRepository.removerViagemPorId(id);
         if (!isRemovido){
-            throw new EntityNotFoundException("Viagem com id: "+id+", não encontrada");
+            throw new EntityNotFoundException("Viagem com id: "+id+", não encontrada!");
         }
     }
 
     public void editarViagem(int id, Viagem viagem){
         boolean isEditada = viagemRepository.editarViagemPorId(id, viagem);
         if (!isEditada){
-            throw new EntityNotFoundException("Viagem com id: "+id+", não encontrada");
+            throw new EntityNotFoundException("Viagem com id: "+id+", não encontrada!");
         }
     }
 }
