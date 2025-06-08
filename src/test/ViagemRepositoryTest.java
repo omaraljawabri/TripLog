@@ -83,7 +83,7 @@ class ViagemRepositoryTest {
 
         viagemRepository.salvarViagem(viagem1);
 
-        Viagem viagem = viagemRepository.buscarViagemPorId(viagem1.getId());
+        Viagem viagem = viagemRepository.buscarViagemPorId(viagem1.getId(), viagem1.getIdViajante());
 
         assertNotNull(viagem);
         assertEquals(viagem.getId(), viagem1.getId());
@@ -93,7 +93,7 @@ class ViagemRepositoryTest {
     void buscarViagemPorId_RetornaNull_QuandoIdPassadoNaoExistir(){
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO);
 
-        Viagem viagem = viagemRepository.buscarViagemPorId(1);
+        Viagem viagem = viagemRepository.buscarViagemPorId(1, 1);
 
         assertNull(viagem);
     }
@@ -105,7 +105,7 @@ class ViagemRepositoryTest {
 
         viagemRepository.salvarViagem(viagem);
 
-        boolean resultado = viagemRepository.removerViagemPorId(viagem.getId());
+        boolean resultado = viagemRepository.removerViagemPorId(viagem.getId(), viagem.getIdViajante());
 
         assertTrue(resultado);
     }
@@ -114,7 +114,7 @@ class ViagemRepositoryTest {
     void removerViagemPorId_RetornaFalse_QuandoViagemComIdPassadoNaoExistir(){
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO);
 
-        boolean resultado = viagemRepository.removerViagemPorId(1);
+        boolean resultado = viagemRepository.removerViagemPorId(1, 1);
 
         assertFalse(resultado);
     }
@@ -126,7 +126,7 @@ class ViagemRepositoryTest {
 
         viagemRepository.salvarViagem(viagem);
 
-        boolean resultado = viagemRepository.editarViagemPorId(viagem.getId(), criarViagem2());
+        boolean resultado = viagemRepository.editarViagemPorId(viagem.getId(), viagem.getIdViajante(), criarViagem2());
 
         assertTrue(resultado);
     }
@@ -134,10 +134,29 @@ class ViagemRepositoryTest {
     @Test
     void editarViagemPorId_RetornaFalse_QuandoViagemComIdPassadoNaoExistir(){
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO);
-        
-        boolean resultado = viagemRepository.editarViagemPorId(1, criarViagem1());
+
+        boolean resultado = viagemRepository.editarViagemPorId(1, 1, criarViagem1());
 
         assertFalse(resultado);
+    }
+
+    @Test
+    void buscarViagensPorIdViajante_RetornaListaDeViagem_QUandoExistirViagemComIdViajantePassado(){
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO);
+
+        viagemRepository.salvarViagem(criarViagem3());
+        List<Viagem> viagens = viagemRepository.buscarViagensPorIdViajante(1);
+
+        assertEquals(1, viagens.size());
+    }
+
+    @Test
+    void buscarViagensPorIdViajante_RetornaListaVazia_QuandoNaoExistirViagemComIdViajantePassado(){
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO);
+
+        List<Viagem> viagens = viagemRepository.buscarViagensPorIdViajante(5);
+
+        assertTrue(viagens.isEmpty());
     }
 
     private Viagem criarViagem1(){
@@ -172,6 +191,7 @@ class ViagemRepositoryTest {
         viagem1.setAtividades(atividades1);
         viagem1.setSaldo(1000.0);
         viagem1.setDiasPercorridos(4);
+        viagem1.setIdViajante(1);
         return viagem1;
     }
 
@@ -207,6 +227,7 @@ class ViagemRepositoryTest {
         viagem2.setAtividades(atividades2);
         viagem2.setSaldo(800.0);
         viagem2.setDiasPercorridos(3);
+        viagem2.setIdViajante(1);
         return viagem2;
     }
 
@@ -241,6 +262,7 @@ class ViagemRepositoryTest {
         viagem3.setAtividades(atividades3);
         viagem3.setSaldo(1500.0);
         viagem3.setDiasPercorridos(5);
+        viagem3.setIdViajante(1);
         return viagem3;
     }
 }

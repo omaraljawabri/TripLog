@@ -6,6 +6,7 @@ import main.repositories.ViagemRepository;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Viajante implements Serializable {
@@ -65,23 +66,37 @@ public class Viajante implements Serializable {
         this.viagens = viagens;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public void adicionarViagem(Viagem v){
         if (v.getLugarDePartida() == null || v.getLugarDeChegada() == null || v.getDeslocamentos().isEmpty()
         || v.getHospedagens().isEmpty() || v.getAtividades().isEmpty()){
             throw new ValidationException("Atributos lugar de partida, lugar de chegada, deslocamentos, hospedagens e atividades devem ser preenchidos");
         }
+        v.setIdViajante(this.id);
         boolean resultado = viagemRepository.salvarViagem(v);
         if (!resultado){
             throw new RuntimeException("Erro ao adicionar nova viagem");
         }
+
+        if (this.getViagens() == null){
+            this.setViagens(new ArrayList<>(List.of(v)));
+            return;
+        }
+
+        this.getViagens().add(v);
     }
 
     public List<Viagem> listarViagens(){
-        return viagemRepository.buscarTodasViagens();
+        List<Viagem> viagensListadas = viagemRepository.buscarViagensPorIdViajante(this.id);
+        this.setViagens(viagensListadas);
+        return viagensListadas;
     }
 
     public Viagem buscarViagemPorId(int id){
-        Viagem viagem = viagemRepository.buscarViagemPorId(id);
+        Viagem viagem = viagemRepository.buscarViagemPorId(id, this.id);
         if (viagem == null){
             throw new EntityNotFoundException("Viagem com id: "+id+", não encontrada!");
         }
@@ -89,14 +104,14 @@ public class Viajante implements Serializable {
     }
 
     public void removerViagem(int id){
-        boolean isRemovido = viagemRepository.removerViagemPorId(id);
+        boolean isRemovido = viagemRepository.removerViagemPorId(id, this.id);
         if (!isRemovido){
             throw new EntityNotFoundException("Viagem com id: "+id+", não encontrada!");
         }
     }
 
     public void editarViagem(int id, Viagem viagem){
-        boolean isEditada = viagemRepository.editarViagemPorId(id, viagem);
+        boolean isEditada = viagemRepository.editarViagemPorId(id, this.id, viagem);
         if (!isEditada){
             throw new EntityNotFoundException("Viagem com id: "+id+", não encontrada!");
         }
