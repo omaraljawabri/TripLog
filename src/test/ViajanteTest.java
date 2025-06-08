@@ -22,7 +22,7 @@ class ViajanteTest {
     private static final String NOME_ARQUIVO = "viagem_test.ser";
 
     @AfterEach
-    void tearDown() throws IOException {
+    void teardown() throws IOException {
         Files.deleteIfExists(Paths.get(NOME_ARQUIVO));
     }
 
