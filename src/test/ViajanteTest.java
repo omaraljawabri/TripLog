@@ -4,13 +4,13 @@ import main.entities.*;
 import main.exceptions.EntityNotFoundException;
 import main.exceptions.ValidationException;
 import main.repositories.ViagemRepository;
+import main.repositories.ViajanteRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,18 +19,21 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ViajanteTest {
 
-    private static final String NOME_ARQUIVO = "viagem_test.ser";
+    private static final String NOME_ARQUIVO_VIAGEM = "viagem_test.ser";
+    private static final String NOME_ARQUIVO_VIAJANTE = "viajante_test.ser";
 
     @AfterEach
     void teardown() throws IOException {
-        Files.deleteIfExists(Paths.get(NOME_ARQUIVO));
+        Files.deleteIfExists(Paths.get(NOME_ARQUIVO_VIAGEM));
+        Files.deleteIfExists(Paths.get(NOME_ARQUIVO_VIAJANTE));
     }
 
     @Test
     void adicionarViagem_AdicionaViagemAoArquivo_QuandoBemSucedido() {
-        ViagemRepository repository = new ViagemRepository(NOME_ARQUIVO);
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
         Viagem viagem = criarViagem1();
-        Viajante viajante = new Viajante("Fulano", "fulano123", LocalDate.of(2002, 12, 20), repository);
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", viagemRepository, viajanteRepository);
 
         viajante.adicionarViagem(viagem);
 
@@ -44,9 +47,10 @@ class ViajanteTest {
 
     @Test
     void adicionarViagem_LancaValidationException_QuandoAtributosObrigatoriosNaoSaoPreenchidos(){
-        ViagemRepository repository = new ViagemRepository(NOME_ARQUIVO);
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
         Viagem viagem = criarViagem1();
-        Viajante viajante = new Viajante("Fulano", "fulano123", LocalDate.of(2002, 12, 20), repository);
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", viagemRepository, viajanteRepository);
         viagem.setLugarDeChegada(null);
 
         ValidationException exception = assertThrows(ValidationException.class, () -> viajante.adicionarViagem(viagem));
@@ -56,20 +60,22 @@ class ViajanteTest {
 
     @Test
     void adicionarViagem_LancaRuntimeException_QuandoAlgumErroOcorreAoAdicionarViagem(){
-        ViagemRepository repository = new ViagemRepository(null);
+        ViagemRepository viagemRepository = new ViagemRepository(null);
+        ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
         Viagem viagem = criarViagem1();
-        Viajante viajante = new Viajante("Fulano", "fulano123", LocalDate.of(2002, 12, 20), repository);
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", viagemRepository, viajanteRepository);
 
         assertThrows(RuntimeException.class, () -> viajante.adicionarViagem(viagem));
     }
 
     @Test
     void listarViagens_RetornaListaDeViagem_QuandoHouveremViagensRegistradas() {
-        ViagemRepository repository = new ViagemRepository(NOME_ARQUIVO);
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
         Viagem viagem = criarViagem1();
         Viagem viagem2 = criarViagem2();
         Viagem viagem3 = criarViagem3();
-        Viajante viajante = new Viajante("Fulano", "fulano123", LocalDate.of(2002, 12, 20), repository);
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", viagemRepository, viajanteRepository);
 
         viajante.adicionarViagem(viagem);
         viajante.adicionarViagem(viagem2);
@@ -83,8 +89,9 @@ class ViajanteTest {
 
     @Test
     void listarViagens_RetornaListaVazia_QUandoNaoHouveremViagensRegistradas(){
-        ViagemRepository repository = new ViagemRepository(NOME_ARQUIVO);
-        Viajante viajante = new Viajante("Fulano", "fulano123", LocalDate.of(2002, 12, 20), repository);
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", viagemRepository, viajanteRepository);
         List<Viagem> viagens = viajante.listarViagens();
 
         assertTrue(viagens.isEmpty());
@@ -92,10 +99,11 @@ class ViajanteTest {
 
     @Test
     void buscarViagemPorId_RetornaViagem_QuandoIdDaViagemBuscadoExistir() {
-        ViagemRepository repository = new ViagemRepository(NOME_ARQUIVO);
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
         Viagem viagem = criarViagem1();
         Viagem viagem2 = criarViagem2();
-        Viajante viajante = new Viajante("Fulano", "fulano123", LocalDate.of(2002, 12, 20), repository);
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", viagemRepository, viajanteRepository);
         
         viajante.adicionarViagem(viagem);
         viajante.adicionarViagem(viagem2);
@@ -108,8 +116,9 @@ class ViajanteTest {
 
     @Test
     void buscarViagemPorId_LancaEntityNotFoundException_QuandoNaoHouverViagemComIdPassado(){
-        ViagemRepository repository = new ViagemRepository(NOME_ARQUIVO);
-        Viajante viajante = new Viajante("Fulano", "fulano123", LocalDate.of(2002, 12, 20), repository);
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", viagemRepository, viajanteRepository);
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> viajante.buscarViagemPorId(2));
 
@@ -118,10 +127,12 @@ class ViajanteTest {
 
     @Test
     void removerViagem_RemoveViagem_QuandoIdDaViagemPassadoExistir() {
-        ViagemRepository repository = new ViagemRepository(NOME_ARQUIVO);
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
+
         Viagem viagem = criarViagem1();
         Viagem viagem2 = criarViagem2();
-        Viajante viajante = new Viajante("Fulano", "fulano123", LocalDate.of(2002, 12, 20), repository);
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", viagemRepository, viajanteRepository);
 
         viajante.adicionarViagem(viagem);
         viajante.adicionarViagem(viagem2);
@@ -135,8 +146,10 @@ class ViajanteTest {
 
     @Test
     void removerViagem_LancaEntityNotFoundException_QuandoIdDaViagemPassadoNaoExistir(){
-        ViagemRepository repository = new ViagemRepository(NOME_ARQUIVO);
-        Viajante viajante = new Viajante("Fulano", "fulano123", LocalDate.of(2002, 12, 20), repository);
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
+
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", viagemRepository, viajanteRepository);
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> viajante.removerViagem(2));
 
@@ -145,10 +158,12 @@ class ViajanteTest {
 
     @Test
     void editarViagem_EditaViagemComIdPassado_QuandoIdPassadoExistir() {
-        ViagemRepository repository = new ViagemRepository(NOME_ARQUIVO);
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
+
         Viagem viagem = criarViagem1();
         Viagem viagem2 = criarViagem2();
-        Viajante viajante = new Viajante("Fulano", "fulano123", LocalDate.of(2002, 12, 20), repository);
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", viagemRepository, viajanteRepository);
 
         viagem.setIdViajante(viajante.getId());
         viagem2.setIdViajante(viajante.getId());
@@ -164,13 +179,86 @@ class ViajanteTest {
 
     @Test
     void editarViagem_LancaEntityNotFoundException_QuandoIdPassadoNaoExistir(){
-        ViagemRepository repository = new ViagemRepository(NOME_ARQUIVO);
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
 
-        Viajante viajante = new Viajante("Fulano", "fulano123", LocalDate.of(2002, 12, 20), repository);
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", viagemRepository, viajanteRepository);
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> viajante.editarViagem(2, criarViagem1()));
 
         assertEquals("Viagem com id: 2, não encontrada!", exception.getMessage());
+    }
+
+    @Test
+    void cadastrar_CadastraViajante_QuandoDadosDoViajanteEstiveremCorretos(){
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
+
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", viagemRepository, viajanteRepository);
+
+        assertDoesNotThrow(viajante::cadastrar);
+    }
+
+    @Test
+    void cadastrar_LancaValidationException_QuandoNomeEmailOuSenhaForemNull(){
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
+
+        Viajante viajante = new Viajante(null, "fulano123", "fulano@example.com", viagemRepository, viajanteRepository);
+
+        ValidationException exception = assertThrows(ValidationException.class, () -> viajante.cadastrar());
+        assertEquals("Email, nome e senha devem ser preenchidos", exception.getMessage());
+    }
+
+    @Test
+    void cadastrar_LancaRuntimeException_QuandoAlgumErroOcorreAoSalvarViajante(){
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViajanteRepository viajanteRepository = new ViajanteRepository("/erro/"+NOME_ARQUIVO_VIAJANTE);
+
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", viagemRepository, viajanteRepository);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> viajante.cadastrar());
+        assertEquals("Erro ao cadastrar viajante", exception.getMessage());
+    }
+
+    @Test
+    void login_RetornaTrue_QuandoUsuarioEAutenticadoComSucesso(){
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
+
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", viagemRepository, viajanteRepository);
+
+        viajante.cadastrar();
+
+        viajante.setSenha("fulano123");
+
+        assertDoesNotThrow(viajante::login);
+    }
+
+    @Test
+    void login_LancaValidationException_QuandoEmailDoViajanteNaoExisteNoSistema(){
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
+
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", viagemRepository, viajanteRepository);
+
+        ValidationException exception = assertThrows(ValidationException.class, viajante::login);
+        assertEquals("Viajante com email ou senha incorreto(s)!", exception.getMessage());
+    }
+
+    @Test
+    void login_LancaValidationException_QuandoSenhaDoViajanteEstaIncorreta(){
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
+
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", viagemRepository, viajanteRepository);
+
+        viajante.cadastrar();
+
+        viajante.setSenha("senhaincorreta123");
+
+        ValidationException exception = assertThrows(ValidationException.class, viajante::login);
+        assertEquals("Viajante com email ou senha incorreto(s)!", exception.getMessage());
     }
 
     private Viagem criarViagem1(){
