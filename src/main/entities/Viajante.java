@@ -3,9 +3,10 @@ package main.entities;
 import main.exceptions.EntityNotFoundException;
 import main.exceptions.ValidationException;
 import main.repositories.ViagemRepository;
+import main.repositories.ViajanteRepository;
+import main.utils.SenhaUtil;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,25 +14,36 @@ public class Viajante implements Serializable {
     private static int contador;
     private int id;
     private String nome;
+    private String email;
     private String senha;
-    private LocalDate dataDeNascimento;
     private List<Viagem> viagens;
 
-    private ViagemRepository viagemRepository;
+    private transient ViagemRepository viagemRepository;
+    private transient ViajanteRepository viajanteRepository;
 
-    public Viajante(ViagemRepository viagemRepository) {
+    public Viajante(ViagemRepository viagemRepository, ViajanteRepository viajanteRepository) {
         Viajante.contador++;
         this.id = Viajante.contador;
         this.viagemRepository = viagemRepository;
+        this.viajanteRepository = viajanteRepository;
     }
 
-    public Viajante(String nome, String senha, LocalDate dataDeNascimento, ViagemRepository viagemRepository) {
+    public Viajante(String nome, String senha, String email, ViagemRepository viagemRepository, ViajanteRepository viajanteRepository) {
         Viajante.contador++;
         this.id = Viajante.contador;
         this.nome = nome;
+        this.email = email;
         this.senha = senha;
-        this.dataDeNascimento = dataDeNascimento;
         this.viagemRepository = viagemRepository;
+        this.viajanteRepository = viajanteRepository;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getNome() {
@@ -48,14 +60,6 @@ public class Viajante implements Serializable {
 
     public void setSenha(String senha) {
         this.senha = senha;
-    }
-
-    public LocalDate getDataDeNascimento() {
-        return dataDeNascimento;
-    }
-
-    public void setDataDeNascimento(LocalDate dataDeNascimento) {
-        this.dataDeNascimento = dataDeNascimento;
     }
 
     public List<Viagem> getViagens() {
@@ -115,5 +119,26 @@ public class Viajante implements Serializable {
         if (!isEditada){
             throw new EntityNotFoundException("Viagem com id: "+id+", não encontrada!");
         }
+    }
+
+    public void cadastrar(){
+        if (this.email == null || this.nome == null || this.senha == null){
+            throw new ValidationException("Email, nome e senha devem ser preenchidos");
+        }
+        String senhaCodificada = SenhaUtil.hashSenha(this.senha);
+        this.setSenha(senhaCodificada);
+        boolean resultado = viajanteRepository.salvarViajante(this);
+
+        if (!resultado){
+            throw new RuntimeException("Erro ao cadastrar viajante");
+        }
+    }
+
+    public Viajante login(){
+        Viajante viajante = viajanteRepository.buscarViajantePorEmail(this.email);
+        if (viajante == null || !SenhaUtil.verificarSenha(this.senha, viajante.getSenha())){
+            throw new ValidationException("Viajante com email ou senha incorreto(s)!");
+        }
+        return viajante;
     }
 }
