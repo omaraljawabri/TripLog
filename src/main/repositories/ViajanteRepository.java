@@ -33,7 +33,6 @@ public class ViajanteRepository {
 
     public Viajante buscarViajantePorEmail(String email){
         List<Viajante> viajantes = buscarTodosViajantes();
-        System.out.println(viajantes.get(0).getEmail());
 
         List<Viajante> viajante = viajantes.stream().filter(v -> v.getEmail().equals(email)).toList();
 
