@@ -3,25 +3,12 @@ package main.entities;
 import java.io.Serializable;
 
 public class Gasto implements Serializable {
-    private int id;
-    private static int contador;
     private double valor;
     private String tipo;
 
-    public Gasto(){
-        Gasto.contador++;
-        this.id = Gasto.contador;
-    }
-
     public Gasto(double valor, String tipo) {
-        Gasto.contador++;
-        this.id = Gasto.contador;
         this.valor = valor;
         this.tipo = tipo;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public double getValor() {
@@ -43,8 +30,7 @@ public class Gasto implements Serializable {
     @Override
     public String toString() {
         return "Gasto{" +
-                "id=" + id +
-                ", valor=" + valor +
+                "valor=" + valor +
                 ", tipo='" + tipo + '\'' +
                 '}';
     }
