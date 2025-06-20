@@ -67,22 +67,21 @@ public class CadastroFrame {
         });
 
         cadastrarButton.addMouseListener(new java.awt.event.MouseAdapter(){
+            @Override
             public void mouseClicked(MouseEvent e) {
                 if (!getSenha().equals(getConfirmarSenha())){
                     JOptionPane.showMessageDialog(mainPanel, "As senhas não conferem!", "Erro", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                ViajanteRepository viajanteRepository = new ViajanteRepository("viajante.txt");
-                ViagemRepository viagemRepository = new ViagemRepository("viagem.txt");
-                Viajante viajante = new Viajante(getNome(), getEmail(), getSenha(), viagemRepository, viajanteRepository);
+                try {
+                    ViajanteRepository viajanteRepository = new ViajanteRepository("viajante.txt");
+                    Viajante viajante = new Viajante(getNome(), getEmail(), getSenha(), null, viajanteRepository);
 
-                boolean resultado = viajante.cadastrar();
-
-                if (!resultado) {
+                    viajante.cadastrar();
+                    telaDeLoginButton.doClick();
+                } catch (RuntimeException ex){
                     JOptionPane.showMessageDialog(mainPanel, "Falha ao cadastrar usuário.", "Erro", JOptionPane.ERROR_MESSAGE);
-                    return;
                 }
-                telaDeLoginButton.doClick();
             }
         });
 
