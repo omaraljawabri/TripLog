@@ -2,6 +2,7 @@ package framesUI;
 
 import main.entities.Viajante;
 import main.repositories.ViajanteRepository;
+import main.services.AuthService;
 import main.utils.EmailUtil;
 
 import javax.swing.*;
@@ -78,10 +79,11 @@ public class CadastroFrame {
                     return;
                 }
                 try {
-                    ViajanteRepository viajanteRepository = new ViajanteRepository("viajante.txt");
-                    Viajante viajante = new Viajante(getNome(), getEmail(), getSenha(), null, viajanteRepository);
+                    ViajanteRepository viajanteRepository = new ViajanteRepository("viajante.ser");
+                    Viajante viajante = new Viajante(getNome(), getSenha(), getEmail());
+                    AuthService authService = new AuthService(viajanteRepository);
 
-                    viajante.cadastrar();
+                    authService.cadastrar(viajante);
                     telaDeLoginButton.doClick();
                 } catch (RuntimeException ex){
                     JOptionPane.showMessageDialog(mainPanel, "Falha ao cadastrar usuário.", "Erro", JOptionPane.ERROR_MESSAGE);

@@ -23,8 +23,7 @@ class ViajanteRepositoryTest {
     @Test
     void salvarViajante_RetornaTrue_QuandoViajanteESalvoComSucesso() {
         ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO);
-
-        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", null, viajanteRepository);
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com");
 
         boolean resultado = viajanteRepository.salvarViajante(viajante);
         assertTrue(resultado);
@@ -34,7 +33,7 @@ class ViajanteRepositoryTest {
     void salvarViajante_RetornaFalse_QuandoErroOcorreAoSalvarViajante(){
         ViajanteRepository viajanteRepository = new ViajanteRepository("/erro/" + NOME_ARQUIVO);
 
-        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", null, viajanteRepository);
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com");
 
         boolean resultado = viajanteRepository.salvarViajante(viajante);
 
@@ -45,7 +44,7 @@ class ViajanteRepositoryTest {
     void buscarViajantePorEmail_RetornaViajante_QuandoExistirViajanteComOEmailPassado() {
         ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO);
 
-        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", null, viajanteRepository);
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com");
 
         viajanteRepository.salvarViajante(viajante);
 

@@ -2,6 +2,7 @@ package framesUI;
 
 import main.entities.Viajante;
 import main.repositories.ViajanteRepository;
+import main.services.AuthService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -62,11 +63,10 @@ public class LoginFrame {
         loginButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 try {
-                    ViajanteRepository viajanteRepository = new ViajanteRepository("viajante.txt");
+                    ViajanteRepository viajanteRepository = new ViajanteRepository("viajante.ser");
+                    AuthService authService = new AuthService(viajanteRepository);
 
-
-                    Viajante viajante = new Viajante(null, getEmail(), getSenha(), null, viajanteRepository);
-                    viajante.login();
+                    authService.login(getSenha(), getEmail());
 
                     JOptionPane.showMessageDialog(mainPanel, "Login bem-sucedido!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                 } catch (RuntimeException exception){
