@@ -121,7 +121,7 @@ public class Viajante implements Serializable {
         }
     }
 
-    public boolean cadastrar(){
+    public void cadastrar(){
         if (this.email == null || this.nome == null || this.senha == null){
             throw new ValidationException("Email, nome e senha devem ser preenchidos");
         }
@@ -130,10 +130,8 @@ public class Viajante implements Serializable {
         boolean resultado = viajanteRepository.salvarViajante(this);
 
         if (!resultado){
-            return false;
+            throw new RuntimeException("Erro ao fazer cadastro");
         }
-
-        return true;
     }
 
     public Viajante login(){

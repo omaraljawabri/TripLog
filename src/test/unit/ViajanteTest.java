@@ -217,8 +217,8 @@ class ViajanteTest {
 
         Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", viagemRepository, viajanteRepository);
 
-        boolean resultado = viajante.cadastrar();
-        assertFalse(resultado);
+        RuntimeException exception = assertThrows(RuntimeException.class, viajante::cadastrar);
+        assertEquals("Erro ao fazer cadastro", exception.getMessage());
     }
 
     @Test
