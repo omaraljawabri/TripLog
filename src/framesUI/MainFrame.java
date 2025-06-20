@@ -1,5 +1,7 @@
 package framesUI;
 
+import com.formdev.flatlaf.FlatLightLaf;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -38,8 +40,14 @@ public class MainFrame extends JFrame {
         cadastro.getTelaDeLoginButton().addActionListener(e -> cardLayout.show(cardPanel, "login"));
     }
 
-    public static void main(String[] args) {
-        // Cria e exibe a aplicação
+    public static void main(String[] args) throws UnsupportedLookAndFeelException {
+        // Tema FlatLaf com personalização
+        FlatLightLaf.setup();
+
+        UIManager.put("Button.arc", 20);
+        UIManager.put("TextComponent.arc", 10);
+        UIManager.put("Component.arc", 10);
+
         SwingUtilities.invokeLater(() -> new MainFrame().setVisible(true));
     }
 }
