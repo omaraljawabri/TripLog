@@ -5,7 +5,7 @@ import java.security.MessageDigest;
 
 public class SenhaUtil {
 
-    //O mais correto seria utilizar BCrypt, contudo, para evitar dependências externas optamos pelo SHA-256
+    //O mais correto seria utilizar BCrypt, contudo, para evitar dependências externas demais optamos pelo SHA-256
     public static String hashSenha(String senha) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -13,7 +13,7 @@ public class SenhaUtil {
 
             StringBuilder sb = new StringBuilder();
             for (byte b : hashBytes) {
-                sb.append(String.format("%02x", b)); // Converte byte para hex
+                sb.append(String.format("%02x", b));
             }
 
             return sb.toString();

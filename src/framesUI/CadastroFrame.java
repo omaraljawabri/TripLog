@@ -1,8 +1,8 @@
 package framesUI;
 
 import main.entities.Viajante;
-import main.repositories.ViagemRepository;
 import main.repositories.ViajanteRepository;
+import main.utils.EmailUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -69,6 +69,10 @@ public class CadastroFrame {
         cadastrarButton.addMouseListener(new java.awt.event.MouseAdapter(){
             @Override
             public void mouseClicked(MouseEvent e) {
+                if (!EmailUtil.validarEmail(getEmail())){
+                    JOptionPane.showMessageDialog(mainPanel, "Formato de email inválido!", "Erro", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
                 if (!getSenha().equals(getConfirmarSenha())){
                     JOptionPane.showMessageDialog(mainPanel, "As senhas não conferem!", "Erro", JOptionPane.ERROR_MESSAGE);
                     return;
