@@ -147,7 +147,7 @@ public class CadastroFrame {
         imagePanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         try {
-            ImageIcon originalIcon = new ImageIcon(getClass().getResource("/resources/images/viagem_site.png"));
+            ImageIcon originalIcon = new ImageIcon(getClass().getResource("../resources/images/viagem_site.png"));
             Image scaledImage = originalIcon.getImage().getScaledInstance(500, 500, Image.SCALE_SMOOTH);
             ImageIcon scaledIcon = new ImageIcon(scaledImage);
 
