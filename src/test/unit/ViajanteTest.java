@@ -1,4 +1,4 @@
-package test;
+package test.unit;
 
 import main.entities.*;
 import main.exceptions.EntityNotFoundException;
@@ -211,14 +211,14 @@ class ViajanteTest {
     }
 
     @Test
-    void cadastrar_LancaRuntimeException_QuandoAlgumErroOcorreAoSalvarViajante(){
+    void cadastrar_RetornaFalse_QuandoAlgumErroOcorreAoSalvarViajante(){
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
         ViajanteRepository viajanteRepository = new ViajanteRepository("/erro/"+NOME_ARQUIVO_VIAJANTE);
 
         Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com", viagemRepository, viajanteRepository);
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> viajante.cadastrar());
-        assertEquals("Erro ao cadastrar viajante", exception.getMessage());
+        boolean resultado = viajante.cadastrar();
+        assertFalse(resultado);
     }
 
     @Test
