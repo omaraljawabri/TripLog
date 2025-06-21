@@ -1,5 +1,6 @@
 package frontend.framesUI;
 
+import backend.main.entities.Viajante;
 import backend.main.repositories.ViajanteRepository;
 import backend.main.services.AuthService;
 
@@ -13,8 +14,10 @@ public class LoginFrame {
     private final JButton telaDeCadastroButton;
     private final JTextField inputEmailLogin;
     private final JPasswordField inputSenhaLogin;
+    private final MainFrame mainFrame;
 
-    public LoginFrame() {
+    public LoginFrame(MainFrame mainFrame) {
+        this.mainFrame = mainFrame;
         mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
 
@@ -66,6 +69,10 @@ public class LoginFrame {
                     AuthService authService = new AuthService(viajanteRepository);
 
                     authService.login(getSenha(), getEmail());
+
+                    Viajante viajante = authService.login(getSenha(), getEmail());
+
+                    mainFrame.abrirHome(viajante);
 
                     JOptionPane.showMessageDialog(mainPanel, "Login bem-sucedido!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
                 } catch (RuntimeException exception){
