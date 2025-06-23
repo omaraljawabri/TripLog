@@ -29,24 +29,44 @@ public class CadastroViagemFrame {
 
     // Botões Salvar e Cancelar do rodapé
     private JButton btnSalvar;
+    private JButton btnCancelar;
+
     public void addCancelarListener(ActionListener listener) {
         btnCancelar.addActionListener(listener);
     }
-    private JButton btnCancelar;
-
 
     /* ==================================================== */
     public CadastroViagemFrame() {
 
         /* ---------- Estrutura base ---------- */
-        mainPanel = new JPanel(new BorderLayout(20, 20));
+        mainPanel = new JPanel();
         mainPanel.setBackground(Color.WHITE);
+        mainPanel.setLayout(new BorderLayout(20, 20));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(5, 30, 20, 30));
 
         montarTopo();
         montarCentro();
-        montarRodape();  // <-- chamar método que cria o rodapé com os botões
+        montarRodape();
+
+        // Tornar a janela rolável e responsiva:
+        // Envolve mainPanel dentro de JScrollPane e substitui mainPanel pelo scroll
+        JScrollPane scrollPane = new JScrollPane(mainPanel,
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+        // Painel externo para layout responsivo, com BoxLayout vertical
+        JPanel wrapper = new JPanel();
+        wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
+        wrapper.setBackground(Color.WHITE);
+        wrapper.add(scrollPane);
+
+        // Trocar mainPanel para o wrapper (para o uso externo)
+        this.mainPanelWrapper = wrapper;
     }
+
+    // Painel wrapper para exibição com scroll
+    private JPanel mainPanelWrapper;
 
     /* ----------------------------- TOPO ----------------------------- */
     private void montarTopo() {
@@ -57,9 +77,11 @@ public class CadastroViagemFrame {
         try {
             ImageIcon img = new ImageIcon(getClass().getResource("../resources/images/beachIcon.png"));
             Image scaled = img.getImage().getScaledInstance(120, -1, Image.SCALE_SMOOTH);
-            topPanel.add(new JLabel(new ImageIcon(scaled)));
+            JLabel imagemLabel = new JLabel(new ImageIcon(scaled));
+            imagemLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            topPanel.add(imagemLabel);
         } catch (Exception e) {
-            /* se a imagem não for encontrada, apenas ignora */
+            // Ignora se a imagem não for encontrada
         }
 
         JLabel title = new JLabel("Cadastro de Nova Viagem");
@@ -75,47 +97,53 @@ public class CadastroViagemFrame {
     /* ---------------------------- CENTRO --------------------------- */
     private void montarCentro() {
 
-        JPanel centerPanel = new JPanel(new GridBagLayout());
+        JPanel centerPanel = new JPanel();
         centerPanel.setBackground(Color.WHITE);
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+
+        JPanel inputsPanel = montarInputsPrincipais();
+        centerPanel.add(inputsPanel);
+        centerPanel.add(Box.createVerticalStrut(15));
+
+        centerPanel.add(montarHospedagem());
+        centerPanel.add(Box.createVerticalStrut(15));
+
+        centerPanel.add(montarAtividades());
+        centerPanel.add(Box.createVerticalStrut(15));
+
+        centerPanel.add(montarDeslocamentos());
+
+        // Envolver em painel com padding e fundo branco
+        JPanel centerWrapper = new JPanel(new BorderLayout());
+        centerWrapper.setBackground(Color.WHITE);
+        centerWrapper.add(centerPanel, BorderLayout.NORTH);
+
+        mainPanel.add(centerWrapper, BorderLayout.CENTER);
+    }
+
+    private JPanel montarInputsPrincipais() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(Color.WHITE);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill   = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(4, 15, 4, 15);
         gbc.weightx = 1;
 
-        /* ---------- Inputs principais ---------- */
-        addLabel(centerPanel, gbc, 0, 0, "Local de Partida");
-        addLabel(centerPanel, gbc, 1, 0, "Local de Chegada");
-        addLabel(centerPanel, gbc, 2, 0, "Saldo");
+        addLabel(panel, gbc, 0, 0, "Local de Partida");
+        addLabel(panel, gbc, 1, 0, "Local de Chegada");
+        addLabel(panel, gbc, 2, 0, "Saldo");
 
-        inputLugarPartida = addField(centerPanel, gbc, 0, 1);
-        inputLugarChegada = addField(centerPanel, gbc, 1, 1);
-        inputSaldo        = addField(centerPanel, gbc, 2, 1);
+        inputLugarPartida = addField(panel, gbc, 0, 1);
+        inputLugarChegada = addField(panel, gbc, 1, 1);
+        inputSaldo        = addField(panel, gbc, 2, 1);
 
-        addLabel(centerPanel, gbc, 0, 2, "Dias de Viagem");
-        addLabel(centerPanel, gbc, 1, 2, "Companhia");
+        addLabel(panel, gbc, 0, 2, "Dias de Viagem");
+        addLabel(panel, gbc, 1, 2, "Companhia");
 
-        inputDiasViagem = addField(centerPanel, gbc, 0, 3);
-        inputCompanhia  = addField(centerPanel, gbc, 1, 3);
+        inputDiasViagem = addField(panel, gbc, 0, 3);
+        inputCompanhia  = addField(panel, gbc, 1, 3);
 
-        /* ---------- Hospedagem ---------- */
-        gbc.gridy = 4; gbc.gridx = 0; gbc.gridwidth = 3;
-        gbc.fill  = GridBagConstraints.BOTH; gbc.weighty = 1;
-        centerPanel.add(montarHospedagem(), gbc);
-
-        /* ---------- Atividades ---------- */
-        gbc.gridy = 5;
-        centerPanel.add(montarAtividades(), gbc);
-
-        /* ---------- Deslocamentos ---------- */
-        gbc.gridy = 6;
-        centerPanel.add(montarDeslocamentos(), gbc);
-
-        /* ---------- Wrapper ---------- */
-        JPanel wrap = new JPanel(new FlowLayout(FlowLayout.CENTER, 60, 0));
-        wrap.setBackground(Color.WHITE);
-        wrap.add(centerPanel);
-
-        mainPanel.add(wrap, BorderLayout.CENTER);
+        return panel;
     }
 
     // ---------- NOVO: montar rodapé com botões ----------
@@ -155,7 +183,7 @@ public class CadastroViagemFrame {
         hospedagemPanel.add(scroll, BorderLayout.CENTER);
 
         JButton btnAddHosp = new JButton("Adicionar");
-        styleAddButton(btnAddHosp);  // <-- aplicar estilo verde
+        styleAddButton(btnAddHosp);
         btnAddHosp.addActionListener(e -> addHospedagemEntry());
         JPanel btnP = new JPanel(new FlowLayout(FlowLayout.LEFT));
         btnP.setBackground(Color.WHITE);
@@ -187,7 +215,7 @@ public class CadastroViagemFrame {
         atividadesPanel.add(scroll, BorderLayout.CENTER);
 
         JButton btnAddAtv = new JButton("Adicionar");
-        styleAddButton(btnAddAtv);  // <-- aplicar estilo verde
+        styleAddButton(btnAddAtv);
         btnAddAtv.addActionListener(e -> addAtividadeEntry());
         JPanel btnP = new JPanel(new FlowLayout(FlowLayout.LEFT));
         btnP.setBackground(Color.WHITE);
@@ -219,7 +247,7 @@ public class CadastroViagemFrame {
         deslocPanel.add(scroll, BorderLayout.CENTER);
 
         JButton btnAddDesl = new JButton("Adicionar");
-        styleAddButton(btnAddDesl);  // <-- aplicar estilo verde
+        styleAddButton(btnAddDesl);
         btnAddDesl.addActionListener(e -> addDeslocamentoEntry());
         JPanel btnP = new JPanel(new FlowLayout(FlowLayout.LEFT));
         btnP.setBackground(Color.WHITE);
@@ -245,7 +273,7 @@ public class CadastroViagemFrame {
             panel.add(new JLabel("Valor Diária:"));panel.add(campo(80));
 
             btnRemove = new JButton("Remover");
-            styleRemoveButton(btnRemove);  // <-- estilizar botão remover vermelho
+            styleRemoveButton(btnRemove);
             panel.add(btnRemove);
 
             btnRemove.addActionListener(e -> {
@@ -277,6 +305,7 @@ public class CadastroViagemFrame {
         private JTextField nomeRestauranteField;
         private JTextField culinariaField;
         private JTextField pratoField;
+        private JTextField custoField;
 
         private JPanel camposEspecificosPanel;
 
@@ -286,12 +315,10 @@ public class CadastroViagemFrame {
             panel.setBackground(Color.WHITE);
             panel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            // Painel de campos específicos
             camposEspecificosPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
             camposEspecificosPanel.setBackground(Color.WHITE);
             panel.add(camposEspecificosPanel);
 
-            // Campos base
             nomeField            = campo(150);
             horarioField         = campo(150);
             temaField            = campo(150);
@@ -299,14 +326,14 @@ public class CadastroViagemFrame {
             nomeRestauranteField = campo(150);
             culinariaField       = campo(100);
             pratoField           = campo(150);
+            custoField           = campo(80);
 
-            // Combo e botão Remover dentro do painel
             tipoCombo = new JComboBox<>(new String[]{"Evento", "Passeio", "Restaurante"});
             tipoCombo.setPreferredSize(new Dimension(120, 30));
             tipoCombo.addActionListener(e -> rebuildCampos());
 
             btnRemove = new JButton("Remover");
-            styleRemoveButton(btnRemove);  // <-- vermelho
+            styleRemoveButton(btnRemove);
             btnRemove.addActionListener(e -> {
                 atividadesEntriesPanel.remove(panel);
                 atividadeEntries.remove(this);
@@ -320,18 +347,17 @@ public class CadastroViagemFrame {
         private void rebuildCampos() {
             camposEspecificosPanel.removeAll();
 
-            // Tipo + botão Remover
             camposEspecificosPanel.add(new JLabel("Tipo:"));
             camposEspecificosPanel.add(tipoCombo);
             camposEspecificosPanel.add(btnRemove);
 
-            // Campos comuns
             camposEspecificosPanel.add(new JLabel("Nome:"));
             camposEspecificosPanel.add(nomeField);
             camposEspecificosPanel.add(new JLabel("Horário:"));
             camposEspecificosPanel.add(horarioField);
+            camposEspecificosPanel.add(new JLabel("Custo:"));
+            camposEspecificosPanel.add(custoField);
 
-            // Campos específicos
             String tipo = (String) tipoCombo.getSelectedItem();
             if ("Evento".equals(tipo)) {
                 camposEspecificosPanel.add(new JLabel("Tema:"));
@@ -386,7 +412,7 @@ public class CadastroViagemFrame {
             panel.add(custoField);
 
             btnRemove = new JButton("Remover");
-            styleRemoveButton(btnRemove);  // vermelho
+            styleRemoveButton(btnRemove);
             panel.add(btnRemove);
 
             btnRemove.addActionListener(e -> {
@@ -530,25 +556,31 @@ public class CadastroViagemFrame {
     }
 
     /* ----------------- GET PANEL (para exibir) ----------------- */
-    public JPanel getPanel() { return mainPanel; }
+    public JPanel getPanel() { return mainPanelWrapper; }
 
     /* ===============  MÉTODOS addEntry  =============== */
     private void addHospedagemEntry() {
         HospedagemEntry e = new HospedagemEntry();
         hospedagemEntries.add(e);
+        hospedagemEntriesPanel.add(Box.createVerticalStrut(10)); // espaço entre entradas
         hospedagemEntriesPanel.add(e.getPanel());
-        hospedagemEntriesPanel.revalidate(); hospedagemEntriesPanel.repaint();
+        hospedagemEntriesPanel.revalidate();
+        hospedagemEntriesPanel.repaint();
     }
     private void addAtividadeEntry() {
         AtividadeEntry e = new AtividadeEntry();
         atividadeEntries.add(e);
+        atividadesEntriesPanel.add(Box.createVerticalStrut(20));
         atividadesEntriesPanel.add(e.getPanel());
-        atividadesEntriesPanel.revalidate(); atividadesEntriesPanel.repaint();
+        atividadesEntriesPanel.revalidate();
+        atividadesEntriesPanel.repaint();
     }
     private void addDeslocamentoEntry() {
         DeslocamentoEntry e = new DeslocamentoEntry();
         deslocamentoEntries.add(e);
+        deslocamentoEntriesPanel.add(Box.createVerticalStrut(10));
         deslocamentoEntriesPanel.add(e.getPanel());
-        deslocamentoEntriesPanel.revalidate(); deslocamentoEntriesPanel.repaint();
+        deslocamentoEntriesPanel.revalidate();
+        deslocamentoEntriesPanel.repaint();
     }
 }

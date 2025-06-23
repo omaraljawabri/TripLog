@@ -4,165 +4,182 @@ import backend.main.entities.Viajante;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.image.BufferedImage;
 
 public class HomeFrame {
+
+    /* ---------- Campos ---------- */
     private final JPanel mainPanel;
     private final JButton cadastrarViagemButton;
     private final JButton minhasViagensButton;
-    private final String nomeUsuario;
 
+    /* Elementos que precisam ser redimensionados dinamicamente */
+    private final JLabel imgLabel;
+    private final Image originalImage;
+    private final JTextArea description;
+    private final JLabel title;
+
+    /* ---------- Construtor ---------- */
     public HomeFrame(Viajante viajante) {
-        this.nomeUsuario = viajante.getNome();
+
+        /* ---------- Painel principal (BorderLayout) ---------- */
         mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
 
-        // Center wrapper com GridBagLayout para centralizar vertical e horizontalmente
-        JPanel centerWrapper = new JPanel(new GridBagLayout());
-        centerWrapper.setOpaque(false);
-
-        // Painel de conteúdo com BoxLayout vertical e margens
+        /* ---------- Painel central com ScrollPane ---------- */
+        // Conteúdo central em Y (imagem, título, descrição)
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setOpaque(false);
         contentPanel.setBorder(BorderFactory.createEmptyBorder(40, 60, 40, 60));
 
-        // --- Imagem (topo) ------------------------------------------------
+        // Centraliza vertical/horizontalmente (e deixa rolar se ficar pequeno)
+        JPanel centerWrapper = new JPanel(new GridBagLayout());
+        centerWrapper.setOpaque(false);
+        centerWrapper.add(contentPanel, new GridBagConstraints());
+
+        JScrollPane scrollPane = new JScrollPane(
+                centerWrapper,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
+        );
+        scrollPane.setBorder(null); // sem borda de scrollPane
+
+        /* ---------- Imagem (topo) ---------- */
+        Image img;
         try {
-            ImageIcon originalIcon = new ImageIcon(getClass().getResource("../resources/images/planeLogo.png"));
-            Image originalImage = originalIcon.getImage();
-
-            // Define tamanho proporcional (largura fixa, altura ajustada)
-            int targetWidth = 320;
-            int originalWidth = originalIcon.getIconWidth();
-            int originalHeight = originalIcon.getIconHeight();
-            int targetHeight = (int) ((double) originalHeight / originalWidth * targetWidth);
-
-            Image scaledImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
-            JLabel imgLabel = new JLabel(new ImageIcon(scaledImage));
-            imgLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            contentPanel.add(imgLabel);
-            contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+            ImageIcon ico = new ImageIcon(getClass().getResource(
+                    "../resources/images/planeLogo.png"));
+            img = ico.getImage();
         } catch (Exception e) {
-            JLabel placeholder = new JLabel("Imagem não encontrada");
-            placeholder.setForeground(new Color(33, 70, 120));
-            placeholder.setAlignmentX(Component.CENTER_ALIGNMENT);
-            contentPanel.add(placeholder);
-            contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+            // Se falhar, cria um retângulo placeholder
+            img = new BufferedImage(320, 120, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2 = ((BufferedImage) img).createGraphics();
+            g2.setPaint(new Color(230, 230, 230));
+            g2.fillRect(0, 0, 320, 120);
+            g2.setPaint(Color.GRAY);
+            g2.drawString("Imagem não encontrada", 40, 60);
+            g2.dispose();
         }
+        originalImage = img;
+        imgLabel = new JLabel(new ImageIcon(img)); // redimensionaremos depois
+        imgLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contentPanel.add(imgLabel);
+        contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // --- Texto --------------------------------------------------------
-        JLabel title = new JLabel("Bem‑vindo, " + nomeUsuario + ", ao TravelPOO!");
-        title.setFont(new Font("Serif", Font.BOLD, 34));
-        title.setForeground(new Color(33, 70, 120));
+        /* ---------- Título ---------- */
+        title = new JLabel("Bem-vindo, " + viajante.getNome() + ", ao TravelPOO!");
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        title.setForeground(new Color(33, 70, 120));
+        contentPanel.add(title);
+        contentPanel.add(Box.createRigidArea(new Dimension(0, 25)));
 
-        JTextArea description = new JTextArea(
+        /* ---------- Descrição ---------- */
+        description = new JTextArea(
                 "Aqui você pode registrar suas viagens, passeios, gastos e muito mais.\n\n" +
                         "➡ Para começar, clique em \"Cadastrar nova viagem\" e preencha detalhes como destinos, " +
                         "restaurantes, eventos e valores gastos.\n\n" +
                         "➡ Se quiser rever ou editar percursos que já cadastrou, escolha \"Minhas viagens\". " +
                         "Lá você encontra todas as suas viagens organizadas em um só lugar!\n\n" +
-                        "Boa jornada e divirta‑se usando o TravelPOO!"
+                        "Boa jornada e divirta-se usando o TravelPOO!"
         );
-        description.setFont(new Font("SansSerif", Font.PLAIN, 16));
-        description.setForeground(new Color(60, 60, 60));
         description.setOpaque(false);
         description.setEditable(false);
         description.setLineWrap(true);
         description.setWrapStyleWord(true);
         description.setAlignmentX(Component.CENTER_ALIGNMENT);
-        description.setMaximumSize(new Dimension(700, Integer.MAX_VALUE));
-
-        contentPanel.add(title);
-        contentPanel.add(Box.createRigidArea(new Dimension(0, 25)));
+        description.setMaximumSize(new Dimension(900, Integer.MAX_VALUE));
         contentPanel.add(description);
 
-        // Configuração do GridBagConstraints para centralização vertical e horizontal
-        GridBagConstraints gbcCenter = new GridBagConstraints();
-        gbcCenter.gridx = 0;
-        gbcCenter.gridy = 0;
-        gbcCenter.weightx = 1;
-        gbcCenter.weighty = 1;
-        gbcCenter.fill = GridBagConstraints.NONE;
-        gbcCenter.anchor = GridBagConstraints.CENTER;
-
-        centerWrapper.add(contentPanel, gbcCenter);
-
-        // --- Rodapé: botões ---
-        JPanel footerPanel = new JPanel(new GridBagLayout());
+        /* ---------- Rodapé com botões ---------- */
+        JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
         footerPanel.setOpaque(false);
         footerPanel.setBorder(BorderFactory.createEmptyBorder(20, 60, 40, 60));
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(0, 10, 0, 10);
 
         cadastrarViagemButton = new JButton("Cadastrar nova viagem");
-        stylePrimaryButton(cadastrarViagemButton);
+        minhasViagensButton   = new JButton("Minhas viagens");
 
-        minhasViagensButton = new JButton("Minhas viagens");
+        stylePrimaryButton(cadastrarViagemButton);
         styleSecondaryButton(minhasViagensButton);
 
-        footerPanel.add(cadastrarViagemButton, gbc);
-        footerPanel.add(minhasViagensButton, gbc);
+        footerPanel.add(cadastrarViagemButton);
+        footerPanel.add(minhasViagensButton);
 
-        mainPanel.add(centerWrapper, BorderLayout.CENTER);
+        /* ---------- Junta tudo ---------- */
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
         mainPanel.add(footerPanel, BorderLayout.SOUTH);
+
+        /* ---------- Responsividade ---------- */
+        mainPanel.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                ajustarLayout(mainPanel.getWidth());
+            }
+        });
+        ajustarLayout( /* inicial */ 800);
     }
 
-    private void stylePrimaryButton(JButton button) {
-        Color normalBG = new Color(0, 123, 255);
-        Color hoverBG = new Color(0, 105, 217);
+    /* ---------- Responsividade: ajusta imagem, fontes, margens ---------- */
+    private void ajustarLayout(int larguraPainel) {
 
-        button.setBackground(normalBG);
+        /* Imagem – usa até 60 % da largura, mas entre 160 px e 480 px */
+        int imgW = Math.max(160, Math.min((int) (larguraPainel * 0.6), 480));
+        int imgH = (int) ((double) originalImage.getHeight(null) /
+                originalImage.getWidth(null) * imgW);
+        imgLabel.setIcon(new ImageIcon(originalImage.getScaledInstance(
+                imgW, imgH, Image.SCALE_SMOOTH)));
+
+        /* Fontes – escala simples */
+        float fator = (float) larguraPainel / 800f;          // 1.0 quando 800 px
+        fator = Math.max(0.8f, Math.min(fator, 1.25f));      // limites
+        title.setFont(title.getFont().deriveFont(34f * fator));
+        description.setFont(description.getFont().deriveFont(16f * fator));
+
+        /* Botões – ocupam toda a largura disponível em telas pequenas */
+        int btnWidth = larguraPainel < 500 ? larguraPainel - 120 : 240;
+        cadastrarViagemButton.setPreferredSize(new Dimension(btnWidth, 48));
+        minhasViagensButton  .setPreferredSize(new Dimension(btnWidth < 200 ? 200 : 180, 48));
+
+        mainPanel.revalidate();
+    }
+
+    /* ---------- Estilos ---------- */
+    private void stylePrimaryButton(JButton button) {
+        Color bg    = new Color(0, 123, 255);
+        Color hover = new Color(0, 105, 217);
+
+        button.setBackground(bg);
         button.setForeground(Color.WHITE);
-        button.setFont(new Font("SansSerif", Font.BOLD, 15));
         button.setFocusPainted(false);
+        button.setFont(new Font("SansSerif", Font.BOLD, 15));
         button.setBorder(BorderFactory.createEmptyBorder(10, 25, 10, 25));
-        button.setPreferredSize(new Dimension(240, 48));
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent e) {
-                button.setBackground(hoverBG);
-            }
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent e) {
-                button.setBackground(normalBG);
-            }
+            public void mouseEntered(java.awt.event.MouseEvent e) { button.setBackground(hover); }
+            public void mouseExited (java.awt.event.MouseEvent e) { button.setBackground(bg);    }
         });
     }
 
     private void styleSecondaryButton(JButton button) {
-        Color borderColor = new Color(0, 123, 255);
-        Color hoverBG = new Color(230, 240, 255);
+        Color border = new Color(0, 123, 255);
+        Color hover  = new Color(230, 240, 255);
 
         button.setBackground(Color.WHITE);
-        button.setForeground(borderColor);
+        button.setForeground(border);
         button.setFont(new Font("SansSerif", Font.BOLD, 15));
         button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createLineBorder(borderColor, 2));
-        button.setPreferredSize(new Dimension(180, 48));
+        button.setBorder(BorderFactory.createLineBorder(border, 2));
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent e) {
-                button.setBackground(hoverBG);
-            }
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent e) {
-                button.setBackground(Color.WHITE);
-            }
+            public void mouseEntered(java.awt.event.MouseEvent e) { button.setBackground(hover); }
+            public void mouseExited (java.awt.event.MouseEvent e) { button.setBackground(Color.WHITE); }
         });
     }
 
-    public JPanel getPanel() {
-        return mainPanel;
-    }
-
-    public JButton getCadastrarViagemButton() {
-        return cadastrarViagemButton;
-    }
-
-    public JButton getMinhasViagensButton() {
-        return minhasViagensButton;
-    }
+    /* ---------- Getters públicos ---------- */
+    public JPanel   getPanel()                { return mainPanel; }
+    public JButton  getCadastrarViagemButton(){ return cadastrarViagemButton; }
+    public JButton  getMinhasViagensButton()  { return minhasViagensButton;  }
 }
