@@ -5,90 +5,139 @@ import com.formdev.flatlaf.FlatLightLaf;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainFrame extends JFrame {
 
     private CardLayout cardLayout;
     private JPanel cardPanel;
 
-    // Instâncias das telas para controle
     private LoginFrame login;
     private CadastroFrame cadastro;
     private CadastroViagemFrame cadastroViagem;
     private HomeFrame home;
+    private ProfileUserFrame perfil;
+    private ListaDeViagensFrame listaDeViagensFrame;
+
+    private Viajante usuarioLogado;
+    private final List<ListaDeViagensFrame.Viagem> viagens = new ArrayList<>();
 
     public MainFrame() {
-        // Configurações da janela principal
         setTitle("Sistema de Acesso");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(650, 500);
-        setLocationRelativeTo(null); // centraliza na tela
+        setLocationRelativeTo(null);
 
-        // CardLayout para alternar entre telas
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
 
-        // Instanciando telas
         login = new LoginFrame(this);
         cadastro = new CadastroFrame();
-        cadastroViagem = new CadastroViagemFrame();
+        home = null;
+        perfil = null;
+        cadastroViagem = null;
 
-        // Instancia home depois, quando for mostrar, para passar o viajante
-
-        // Adiciona os painéis ao cardPanel
         cardPanel.add(login.getPanel(), "login");
         cardPanel.add(cadastro.getPanel(), "cadastro");
-        cardPanel.add(cadastroViagem.getPanel(), "cadastroViagem");
 
-        // Define o painel principal como cardPanel
         setContentPane(cardPanel);
-
-        // MOSTRA A TELA DE LOGIN PRIMEIRO
         cardLayout.show(cardPanel, "login");
 
-        // Lógica de troca de telas
         login.getTelaDeCadastroButton().addActionListener(e -> cardLayout.show(cardPanel, "cadastro"));
         cadastro.getTelaDeLoginButton().addActionListener(e -> cardLayout.show(cardPanel, "login"));
-
-        // Exemplo: para abrir tela de cadastro de viagem (você deve disparar isso da sua lógica)
-        // cadastroViagem.addCancelarListener(e -> voltarParaHomeOuLogin());
-
-        // Opcional: Se quiser um método para abrir cadastro de viagem
-        // abrirCadastroViagem();
-
-        // *** Exemplo de como configurar o botão Cancelar do cadastro de viagem ***
-        cadastroViagem.addCancelarListener(e -> {
-            // Aqui decide para onde voltar, exemplo volta para login
-            cardLayout.show(cardPanel, "login");
-        });
     }
 
-    // Método para mostrar qualquer tela pelo nome
     public void mostrarTela(String nomeTela) {
         cardLayout.show(cardPanel, nomeTela);
     }
 
-    // Abrir home com viajante, substituindo o conteúdo da janela (não CardLayout)
     public void abrirHome(Viajante viajante) {
+        this.usuarioLogado = viajante;
+
+        // Remove o painel antigo se existir
+        if (home != null) {
+            cardPanel.remove(home.getPanel());
+        }
+
         home = new HomeFrame(viajante);
-        setContentPane(home.getPanel());
+        home.setCadastrarViagemButtonListener(e -> abrirCadastroViagem());
+        home.setMinhasViagensButtonListener(e -> abrirPerfil(usuarioLogado));
+        cardPanel.add(home.getPanel(), "home");
+
+        cardLayout.show(cardPanel, "home");
         revalidate();
         repaint();
     }
 
-    // Exemplo de método para abrir a tela de cadastro de viagem
     public void abrirCadastroViagem() {
-        cardLayout.show(cardPanel, "cadastroViagem");
+        if (usuarioLogado != null) {
+            if (cadastroViagem != null) {
+                cardPanel.remove(cadastroViagem.getPanel());
+            }
+
+            cadastroViagem = new CadastroViagemFrame(usuarioLogado);
+            cadastroViagem.addCancelarListener(e -> voltarParaHomeOuLogin());
+
+            cardPanel.add(cadastroViagem.getPanel(), "cadastroViagem");
+            revalidate();
+            repaint();
+            cardLayout.show(cardPanel, "cadastroViagem");
+        } else {
+            JOptionPane.showMessageDialog(this, "Usuário não está logado.");
+        }
     }
 
-    // Caso queira voltar para home ou login (exemplo)
+    public void abrirPerfil(Viajante viajante) {
+        this.usuarioLogado = viajante;
+
+        if (perfil != null) {
+            cardPanel.remove(perfil.getPanel());
+        }
+
+        perfil = new ProfileUserFrame(viajante);
+
+        perfil.setBtnInicioListener(() -> abrirHome(usuarioLogado));
+        perfil.getBtnListaViagens().addActionListener(e -> abrirListaDeViagens());
+        perfil.getBtnLogout().addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, "Logout efetuado!");
+            usuarioLogado = null;
+            cardLayout.show(cardPanel, "login");
+        });
+
+        cardPanel.add(perfil.getPanel(), "perfil");
+        cardLayout.show(cardPanel, "perfil");
+        revalidate();
+        repaint();
+    }
+
+    public void abrirListaDeViagens() {
+        listaDeViagensFrame = new ListaDeViagensFrame(
+                viagens,
+                viagem -> JOptionPane.showMessageDialog(this, "Abrindo detalhes de: " + viagem.getLugarChegada()),
+                viagem -> {
+                    JOptionPane.showMessageDialog(this, "Viagem para " + viagem.getLugarChegada() + " excluída!");
+                    viagens.remove(viagem);
+                },
+                e -> abrirPerfil(usuarioLogado),
+                e -> abrirCadastroViagem()
+        );
+
+        cardPanel.add(listaDeViagensFrame.getPanel(), "listaViagens");
+        cardLayout.show(cardPanel, "listaViagens");
+        revalidate();
+        repaint();
+    }
+
     private void voltarParaHomeOuLogin() {
-        // Aqui você pode controlar lógica para voltar para home ou login
-        cardLayout.show(cardPanel, "login");
+        if (usuarioLogado != null) {
+            abrirHome(usuarioLogado);
+        } else {
+            cardLayout.show(cardPanel, "login");
+        }
     }
 
     public static void main(String[] args) throws UnsupportedLookAndFeelException {
-        // Tema FlatLaf com personalização
         FlatLightLaf.setup();
 
         UIManager.put("Button.arc", 20);

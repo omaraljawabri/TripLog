@@ -3,19 +3,22 @@ package frontend.framesUI;
 import backend.main.entities.Viajante;
 
 import javax.swing.*;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CadastroViagemFrame {
-    /* ----------------- Campos da janela ----------------- */
+public class DetalhesViagemFrame {
 
     private final JPanel mainPanel;
+    private JPanel mainPanelWrapper;
 
     private JTextField inputLugarPartida;
     private JTextField inputLugarChegada;
     private JTextField inputSaldo;
+    private JTextField inputValorGasto;
+    private JTextField inputResultado;
     private JTextField inputDiasViagem;
     private JTextField inputCompanhia;
 
@@ -28,48 +31,49 @@ public class CadastroViagemFrame {
     private JPanel deslocamentoEntriesPanel;
     private List<DeslocamentoEntry> deslocamentoEntries;
 
-    // Botões Salvar e Cancelar do rodapé
     private JButton btnSalvar;
     private JButton btnCancelar;
 
+    // Interface para salvar/descartar edição
+    public void addSalvarListener(ActionListener listener) {
+        btnSalvar.addActionListener(listener);
+    }
     public void addCancelarListener(ActionListener listener) {
         btnCancelar.addActionListener(listener);
     }
 
     /* ==================================================== */
-    public CadastroViagemFrame(Viajante viajante) {
-
-        /* ---------- Estrutura base ---------- */
-        mainPanel = new JPanel();
+    public DetalhesViagemFrame(Viajante viajante) {
+        mainPanel = new JPanel(new BorderLayout(20, 20));
         mainPanel.setBackground(Color.WHITE);
-        mainPanel.setLayout(new BorderLayout(20, 20));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(5, 30, 20, 30));
 
         montarTopo();
         montarCentro();
         montarRodape();
 
-        // Tornar a janela rolável e responsiva:
-        // Envolve mainPanel dentro de JScrollPane e substitui mainPanel pelo scroll
         JScrollPane scrollPane = new JScrollPane(mainPanel,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
-        // Painel externo para layout responsivo, com BoxLayout vertical
         JPanel wrapper = new JPanel();
         wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
         wrapper.setBackground(Color.WHITE);
         wrapper.add(scrollPane);
 
-        // Trocar mainPanel para o wrapper (para o uso externo)
         this.mainPanelWrapper = wrapper;
+
+        // Atualizar resultado sempre que saldo ou valor gasto mudarem
+        DocumentListener updateResultadoListener = new DocumentListener() {
+            public void insertUpdate(javax.swing.event.DocumentEvent e) { atualizarResultado(); }
+            public void removeUpdate(javax.swing.event.DocumentEvent e) { atualizarResultado(); }
+            public void changedUpdate(javax.swing.event.DocumentEvent e) { atualizarResultado(); }
+        };
+        inputSaldo.getDocument().addDocumentListener(updateResultadoListener);
+        inputValorGasto.getDocument().addDocumentListener(updateResultadoListener);
     }
 
-    // Painel wrapper para exibição com scroll
-    private JPanel mainPanelWrapper;
-
-    /* ----------------------------- TOPO ----------------------------- */
     private void montarTopo() {
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
@@ -82,10 +86,10 @@ public class CadastroViagemFrame {
             imagemLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             topPanel.add(imagemLabel);
         } catch (Exception e) {
-            // Ignora se a imagem não for encontrada
+            // Ignora se não encontrar imagem
         }
 
-        JLabel title = new JLabel("Cadastro de Nova Viagem");
+        JLabel title = new JLabel("Detalhes da Viagem");
         title.setFont(new Font("Arial", Font.BOLD, 38));
         title.setForeground(new Color(33, 70, 120));
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -95,15 +99,12 @@ public class CadastroViagemFrame {
         mainPanel.add(topPanel, BorderLayout.NORTH);
     }
 
-    /* ---------------------------- CENTRO --------------------------- */
     private void montarCentro() {
-
         JPanel centerPanel = new JPanel();
         centerPanel.setBackground(Color.WHITE);
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
 
-        JPanel inputsPanel = montarInputsPrincipais();
-        centerPanel.add(inputsPanel);
+        centerPanel.add(montarInputsPrincipais());
         centerPanel.add(Box.createVerticalStrut(15));
 
         centerPanel.add(montarHospedagem());
@@ -114,7 +115,6 @@ public class CadastroViagemFrame {
 
         centerPanel.add(montarDeslocamentos());
 
-        // Envolver em painel com padding e fundo branco
         JPanel centerWrapper = new JPanel(new BorderLayout());
         centerWrapper.setBackground(Color.WHITE);
         centerWrapper.add(centerPanel, BorderLayout.NORTH);
@@ -126,7 +126,7 @@ public class CadastroViagemFrame {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(Color.WHITE);
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill   = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(4, 15, 4, 15);
         gbc.weightx = 1;
 
@@ -136,18 +136,24 @@ public class CadastroViagemFrame {
 
         inputLugarPartida = addField(panel, gbc, 0, 1);
         inputLugarChegada = addField(panel, gbc, 1, 1);
-        inputSaldo        = addField(panel, gbc, 2, 1);
+        inputSaldo = addField(panel, gbc, 2, 1);
 
-        addLabel(panel, gbc, 0, 2, "Dias de Viagem");
-        addLabel(panel, gbc, 1, 2, "Companhia");
+        addLabel(panel, gbc, 0, 2, "Valor Gasto");
+        addLabel(panel, gbc, 1, 2, "Resultado (Saldo - Gasto)");
+        addLabel(panel, gbc, 2, 2, "Dias de Viagem");
 
-        inputDiasViagem = addField(panel, gbc, 0, 3);
-        inputCompanhia  = addField(panel, gbc, 1, 3);
+        inputValorGasto = addField(panel, gbc, 0, 3);
+        inputResultado = addField(panel, gbc, 1, 3);
+        inputResultado.setEditable(false);
+        inputResultado.setBackground(new Color(240,240,240));
+        inputDiasViagem = addField(panel, gbc, 2, 3);
+
+        addLabel(panel, gbc, 0, 4, "Companhia");
+        inputCompanhia = addField(panel, gbc, 0, 5);
 
         return panel;
     }
 
-    // ---------- NOVO: montar rodapé com botões ----------
     private void montarRodape() {
         JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 15));
         footerPanel.setBackground(Color.WHITE);
@@ -164,10 +170,8 @@ public class CadastroViagemFrame {
         mainPanel.add(footerPanel, BorderLayout.SOUTH);
     }
 
-
     /* ======================  PAINEL HOSPEDAGEM  ====================== */
     private JPanel montarHospedagem() {
-
         JPanel hospedagemPanel = new JPanel(new BorderLayout());
         hospedagemPanel.setBackground(Color.WHITE);
 
@@ -197,7 +201,6 @@ public class CadastroViagemFrame {
 
     /* ======================  PAINEL ATIVIDADES  ====================== */
     private JPanel montarAtividades() {
-
         JPanel atividadesPanel = new JPanel(new BorderLayout());
         atividadesPanel.setBackground(Color.WHITE);
 
@@ -229,7 +232,6 @@ public class CadastroViagemFrame {
 
     /* ======================  PAINEL DESLOCAMENTOS  ====================== */
     private JPanel montarDeslocamentos() {
-
         JPanel deslocPanel = new JPanel(new BorderLayout());
         deslocPanel.setBackground(Color.WHITE);
 
@@ -264,14 +266,25 @@ public class CadastroViagemFrame {
         private final JPanel panel;
         private final JButton btnRemove;
 
-        public HospedagemEntry() {
+        private JTextField nomeLocalField;
+        private JTextField noitesField;
+        private JTextField valorDiariaField;
 
+        public HospedagemEntry() {
             panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
             panel.setBackground(Color.WHITE);
 
-            panel.add(new JLabel("Nome Local:"));  panel.add(campo(200));
-            panel.add(new JLabel("Noites:"));      panel.add(campo(60));
-            panel.add(new JLabel("Valor Diária:"));panel.add(campo(80));
+            panel.add(new JLabel("Nome Local:"));
+            nomeLocalField = campo(200);
+            panel.add(nomeLocalField);
+
+            panel.add(new JLabel("Noites:"));
+            noitesField = campo(60);
+            panel.add(noitesField);
+
+            panel.add(new JLabel("Valor Diária:"));
+            valorDiariaField = campo(80);
+            panel.add(valorDiariaField);
 
             btnRemove = new JButton("Remover");
             styleRemoveButton(btnRemove);
@@ -290,14 +303,25 @@ public class CadastroViagemFrame {
             f.setPreferredSize(new Dimension(width, 30));
             return f;
         }
+
         public JPanel getPanel() { return panel; }
+
+        // Métodos para obter/definir valores
+        public void setData(String nome, String noites, String valorDiaria) {
+            nomeLocalField.setText(nome);
+            noitesField.setText(noites);
+            valorDiariaField.setText(valorDiaria);
+        }
+        public String getNomeLocal() { return nomeLocalField.getText(); }
+        public String getNoites() { return noitesField.getText(); }
+        public String getValorDiaria() { return valorDiariaField.getText(); }
     }
 
     /* =====================  ENTRADA DE ATIVIDADE  ==================== */
     private class AtividadeEntry {
-        private JPanel panel;
-        private JComboBox<String> tipoCombo;
-        private JButton btnRemove;
+        private final JPanel panel;
+        private final JComboBox<String> tipoCombo;
+        private final JButton btnRemove;
 
         private JTextField nomeField;
         private JTextField horarioField;
@@ -320,14 +344,14 @@ public class CadastroViagemFrame {
             camposEspecificosPanel.setBackground(Color.WHITE);
             panel.add(camposEspecificosPanel);
 
-            nomeField            = campo(150);
-            horarioField         = campo(150);
-            temaField            = campo(150);
-            nomeLocalField       = campo(150);
+            nomeField = campo(150);
+            horarioField = campo(150);
+            temaField = campo(150);
+            nomeLocalField = campo(150);
             nomeRestauranteField = campo(150);
-            culinariaField       = campo(100);
-            pratoField           = campo(150);
-            custoField           = campo(80);
+            culinariaField = campo(100);
+            pratoField = campo(150);
+            custoField = campo(80);
 
             tipoCombo = new JComboBox<>(new String[]{"Evento", "Passeio", "Restaurante"});
             tipoCombo.setPreferredSize(new Dimension(120, 30));
@@ -389,6 +413,22 @@ public class CadastroViagemFrame {
         public JPanel getPanel() {
             return panel;
         }
+
+        // Métodos para preencher campos
+        public void setData(String tipo, String nome, String horario, String custo,
+                            String tema, String local, String restaurante,
+                            String culinaria, String prato) {
+            tipoCombo.setSelectedItem(tipo);
+            nomeField.setText(nome);
+            horarioField.setText(horario);
+            custoField.setText(custo);
+            temaField.setText(tema);
+            nomeLocalField.setText(local);
+            nomeRestauranteField.setText(restaurante);
+            culinariaField.setText(culinaria);
+            pratoField.setText(prato);
+            rebuildCampos();
+        }
     }
 
     /* =====================  ENTRADA DE DESLOCAMENTO  ==================== */
@@ -400,7 +440,6 @@ public class CadastroViagemFrame {
         private JTextField custoField;
 
         public DeslocamentoEntry() {
-
             panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
             panel.setBackground(Color.WHITE);
 
@@ -430,7 +469,28 @@ public class CadastroViagemFrame {
             return f;
         }
 
-        public JPanel getPanel() { return panel; }
+        public JPanel getPanel() {
+            return panel;
+        }
+
+        // Métodos para preencher dados
+        public void setData(String meio, String custo) {
+            meioTransporteField.setText(meio);
+            custoField.setText(custo);
+        }
+    }
+
+    /* ===================  MÉTODOS AUXILIARES =================== */
+
+    private void atualizarResultado() {
+        try {
+            double saldo = Double.parseDouble(inputSaldo.getText().replace(",", "."));
+            double gasto = Double.parseDouble(inputValorGasto.getText().replace(",", "."));
+            double res = saldo - gasto;
+            inputResultado.setText(String.format("%.2f", res));
+        } catch (Exception e) {
+            inputResultado.setText("");
+        }
     }
 
     /* ---------------------  UTILIDADES DE UI --------------------- */
@@ -440,28 +500,31 @@ public class CadastroViagemFrame {
     }
 
     private JTextField addField(JPanel p, GridBagConstraints gbc, int x, int y) {
-        gbc.gridx = x; gbc.gridy = y;
+        gbc.gridx = x;
+        gbc.gridy = y;
         JTextField f = new JTextField();
         styleField(f);
         p.add(f, gbc);
         return f;
     }
+
     private void addLabel(JPanel p, GridBagConstraints gbc, int x, int y, String text) {
-        gbc.gridx = x; gbc.gridy = y;
+        gbc.gridx = x;
+        gbc.gridy = y;
         JLabel l = new JLabel(text);
         styleLabelSemibold(l);
         p.add(l, gbc);
     }
+
     private void styleField(JTextField f) {
         f.setPreferredSize(new Dimension(250, 40));
         f.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200)),
-                BorderFactory.createEmptyBorder(8,10,8,10)));
+                BorderFactory.createEmptyBorder(8, 10, 8, 10)));
         f.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        f.setForeground(new Color(60,60,60));
+        f.setForeground(new Color(60, 60, 60));
     }
 
-    // -------- Estilo botões (baseado no HomeFrame) --------
     private void stylePrimaryButton(JButton button) {
         Color normalBG = new Color(0, 123, 255);
         Color hoverBG = new Color(0, 105, 217);
@@ -478,6 +541,7 @@ public class CadastroViagemFrame {
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 button.setBackground(hoverBG);
             }
+
             @Override
             public void mouseExited(java.awt.event.MouseEvent e) {
                 button.setBackground(normalBG);
@@ -501,6 +565,7 @@ public class CadastroViagemFrame {
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 button.setBackground(hoverBG);
             }
+
             @Override
             public void mouseExited(java.awt.event.MouseEvent e) {
                 button.setBackground(Color.WHITE);
@@ -508,7 +573,6 @@ public class CadastroViagemFrame {
         });
     }
 
-    // Estilo botão Adicionar verde com letras brancas
     private void styleAddButton(JButton button) {
         Color normalBG = new Color(40, 167, 69);
         Color hoverBG = new Color(30, 140, 50);
@@ -525,6 +589,7 @@ public class CadastroViagemFrame {
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 button.setBackground(hoverBG);
             }
+
             @Override
             public void mouseExited(java.awt.event.MouseEvent e) {
                 button.setBackground(normalBG);
@@ -532,7 +597,6 @@ public class CadastroViagemFrame {
         });
     }
 
-    // Estilo botão Remover vermelho com letras brancas
     private void styleRemoveButton(JButton button) {
         Color normalBG = new Color(220, 53, 69);
         Color hoverBG = new Color(180, 40, 55);
@@ -549,6 +613,7 @@ public class CadastroViagemFrame {
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 button.setBackground(hoverBG);
             }
+
             @Override
             public void mouseExited(java.awt.event.MouseEvent e) {
                 button.setBackground(normalBG);
@@ -556,18 +621,20 @@ public class CadastroViagemFrame {
         });
     }
 
-    /* ----------------- GET PANEL (para exibir) ----------------- */
-    public JPanel getPanel() { return mainPanelWrapper; }
+    public JPanel getPanel() {
+        return mainPanelWrapper;
+    }
 
-    /* ===============  MÉTODOS addEntry  =============== */
+    /* =============== MÉTODOS ADD ENTRY =============== */
     private void addHospedagemEntry() {
         HospedagemEntry e = new HospedagemEntry();
         hospedagemEntries.add(e);
-        hospedagemEntriesPanel.add(Box.createVerticalStrut(10)); // espaço entre entradas
+        hospedagemEntriesPanel.add(Box.createVerticalStrut(10));
         hospedagemEntriesPanel.add(e.getPanel());
         hospedagemEntriesPanel.revalidate();
         hospedagemEntriesPanel.repaint();
     }
+
     private void addAtividadeEntry() {
         AtividadeEntry e = new AtividadeEntry();
         atividadeEntries.add(e);
@@ -576,6 +643,7 @@ public class CadastroViagemFrame {
         atividadesEntriesPanel.revalidate();
         atividadesEntriesPanel.repaint();
     }
+
     private void addDeslocamentoEntry() {
         DeslocamentoEntry e = new DeslocamentoEntry();
         deslocamentoEntries.add(e);
@@ -583,5 +651,88 @@ public class CadastroViagemFrame {
         deslocamentoEntriesPanel.add(e.getPanel());
         deslocamentoEntriesPanel.revalidate();
         deslocamentoEntriesPanel.repaint();
+    }
+
+    /* ================== MÉTODOS PARA CARREGAR DADOS ================== */
+    // Exemplo para popular campos com dados existentes - você deve adaptar conforme o modelo da sua aplicação
+    public void carregarDadosViagem(
+            String lugarPartida,
+            String lugarChegada,
+            String saldo,
+            String valorGasto,
+            String diasViagem,
+            String companhia,
+            List<HospedagemDados> listaHospedagem,
+            List<AtividadeDados> listaAtividades,
+            List<DeslocamentoDados> listaDeslocamentos
+    ) {
+        inputLugarPartida.setText(lugarPartida);
+        inputLugarChegada.setText(lugarChegada);
+        inputSaldo.setText(saldo);
+        inputValorGasto.setText(valorGasto);
+        inputDiasViagem.setText(diasViagem);
+        inputCompanhia.setText(companhia);
+        atualizarResultado();
+
+        hospedagemEntriesPanel.removeAll();
+        hospedagemEntries.clear();
+        for (HospedagemDados h : listaHospedagem) {
+            HospedagemEntry e = new HospedagemEntry();
+            e.setData(h.nomeLocal, h.noites, h.valorDiaria);
+            hospedagemEntries.add(e);
+            hospedagemEntriesPanel.add(Box.createVerticalStrut(10));
+            hospedagemEntriesPanel.add(e.getPanel());
+        }
+        hospedagemEntriesPanel.revalidate();
+        hospedagemEntriesPanel.repaint();
+
+        atividadesEntriesPanel.removeAll();
+        atividadeEntries.clear();
+        for (AtividadeDados a : listaAtividades) {
+            AtividadeEntry e = new AtividadeEntry();
+            e.setData(a.tipo, a.nome, a.horario, a.custo, a.tema, a.local, a.restaurante, a.culinaria, a.prato);
+            atividadeEntries.add(e);
+            atividadesEntriesPanel.add(Box.createVerticalStrut(20));
+            atividadesEntriesPanel.add(e.getPanel());
+        }
+        atividadesEntriesPanel.revalidate();
+        atividadesEntriesPanel.repaint();
+
+        deslocamentoEntriesPanel.removeAll();
+        deslocamentoEntries.clear();
+        for (DeslocamentoDados d : listaDeslocamentos) {
+            DeslocamentoEntry e = new DeslocamentoEntry();
+            e.setData(d.meioTransporte, d.custo);
+            deslocamentoEntries.add(e);
+            deslocamentoEntriesPanel.add(Box.createVerticalStrut(10));
+            deslocamentoEntriesPanel.add(e.getPanel());
+        }
+        deslocamentoEntriesPanel.revalidate();
+        deslocamentoEntriesPanel.repaint();
+    }
+
+    /* ================== CLASSES DE DADOS SIMPLES PARA CARREGAR ================== */
+    public static class HospedagemDados {
+        public String nomeLocal, noites, valorDiaria;
+        public HospedagemDados(String n, String noit, String val) {
+            nomeLocal = n; noites = noit; valorDiaria = val;
+        }
+    }
+
+    public static class AtividadeDados {
+        public String tipo, nome, horario, custo, tema, local, restaurante, culinaria, prato;
+        public AtividadeDados(String tipo, String nome, String horario, String custo, String tema,
+                              String local, String restaurante, String culinaria, String prato) {
+            this.tipo = tipo; this.nome = nome; this.horario = horario; this.custo = custo;
+            this.tema = tema; this.local = local; this.restaurante = restaurante;
+            this.culinaria = culinaria; this.prato = prato;
+        }
+    }
+
+    public static class DeslocamentoDados {
+        public String meioTransporte, custo;
+        public DeslocamentoDados(String meio, String custo) {
+            meioTransporte = meio; this.custo = custo;
+        }
     }
 }
