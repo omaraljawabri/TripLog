@@ -88,10 +88,6 @@ public class Viagem implements Serializable {
         this.hospedagens = hospedagens;
     }
 
-    public double getSaldo() {
-        return saldo;
-    }
-
     public void setSaldo(double saldo) {
         this.saldo = saldo;
     }
@@ -112,16 +108,8 @@ public class Viagem implements Serializable {
         this.atividades = atividades;
     }
 
-    public LocalDate getDataChegada() {
-        return dataChegada;
-    }
-
     public void setDataChegada(LocalDate dataChegada) {
         this.dataChegada = dataChegada;
-    }
-
-    public LocalDate getDataTermino() {
-        return dataTermino;
     }
 
     public void setDataTermino(LocalDate dataTermino) {
@@ -150,19 +138,5 @@ public class Viagem implements Serializable {
             return (int) ChronoUnit.DAYS.between(this.dataChegada, this.dataTermino);
         }
         return 0;
-    }
-
-    @Override
-    public String toString() {
-        return "Viagem{" +
-                "id=" + id +
-                ", lugarDePartida='" + lugarDePartida + '\'' +
-                ", lugarDeChegada='" + lugarDeChegada + '\'' +
-                ", deslocamentos=" + deslocamentos +
-                ", hospedagens=" + hospedagens +
-                ", saldo=" + saldo +
-                ", companhia='" + companhia + '\'' +
-                ", atividades=" + atividades +
-                '}';
     }
 }

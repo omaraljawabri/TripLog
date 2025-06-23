@@ -19,24 +19,4 @@ public class Evento extends Atividade implements Serializable {
         this.id = Evento.contador;
         this.tema = tema;
     }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getTema() {
-        return tema;
-    }
-
-    public void setTema(String tema) {
-        this.tema = tema;
-    }
-
-    @Override
-    public String toString() {
-        return "Evento{" +
-                "id=" + id +
-                ", tema='" + tema + '\'' +
-                '}';
-    }
 }

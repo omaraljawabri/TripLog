@@ -19,24 +19,4 @@ public class Passeio extends Atividade implements Serializable {
         this.id = Passeio.contador;
         this.nomeLocal = nomeLocal;
     }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getNomeLocal() {
-        return nomeLocal;
-    }
-
-    public void setNomeLocal(String nomeLocal) {
-        this.nomeLocal = nomeLocal;
-    }
-
-    @Override
-    public String toString() {
-        return "Passeio{" +
-                "id=" + id +
-                ", nomeLocal='" + nomeLocal + '\'' +
-                '}';
-    }
 }

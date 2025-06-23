@@ -11,28 +11,7 @@ public class Deslocamento implements Serializable {
         this.custo = custo;
     }
 
-
-    public String getMeioDeTransporte() {
-        return meioDeTransporte;
-    }
-
-    public void setMeioDeTransporte(String meioDeTransporte) {
-        this.meioDeTransporte = meioDeTransporte;
-    }
-
     public double getCusto() {
         return custo;
-    }
-
-    public void setCusto(double custo) {
-        this.custo = custo;
-    }
-
-    @Override
-    public String toString() {
-        return "Deslocamento{" +
-                "meioDeTransporte='" + meioDeTransporte + '\'' +
-                ", custo=" + custo +
-                '}';
     }
 }
