@@ -4,10 +4,15 @@ import backend.main.entities.Viajante;
 
 import javax.swing.*;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.awt.event.*;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 public class DetalhesViagemFrame {
 
@@ -19,6 +24,8 @@ public class DetalhesViagemFrame {
     private JTextField inputSaldo;
     private JTextField inputValorGasto;
     private JTextField inputResultado;
+    private JFormattedTextField inputDataChegada;
+    private JFormattedTextField inputDataSaida;
     private JTextField inputDiasViagem;
     private JTextField inputCompanhia;
 
@@ -130,28 +137,75 @@ public class DetalhesViagemFrame {
         gbc.insets = new Insets(4, 15, 4, 15);
         gbc.weightx = 1;
 
+        // Linha 0 - Labels
         addLabel(panel, gbc, 0, 0, "Local de Partida");
         addLabel(panel, gbc, 1, 0, "Local de Chegada");
-        addLabel(panel, gbc, 2, 0, "Saldo");
+        addLabel(panel, gbc, 2, 0, "Companhia");
 
+        // Linha 1 - Campos texto
         inputLugarPartida = addField(panel, gbc, 0, 1);
         inputLugarChegada = addField(panel, gbc, 1, 1);
-        inputSaldo = addField(panel, gbc, 2, 1);
+        inputCompanhia = addField(panel, gbc, 2, 1);
 
-        addLabel(panel, gbc, 0, 2, "Valor Gasto");
-        addLabel(panel, gbc, 1, 2, "Resultado (Saldo - Gasto)");
-        addLabel(panel, gbc, 2, 2, "Dias de Viagem");
+        // Linha 2 - Labels
+        addLabel(panel, gbc, 0, 2, "Saldo");
+        addLabel(panel, gbc, 1, 2, "Valor Gasto");
+        addLabel(panel, gbc, 2, 2, "Resultado (Saldo - Gasto)");
 
-        inputValorGasto = addField(panel, gbc, 0, 3);
-        inputResultado = addField(panel, gbc, 1, 3);
+        // Linha 3 - Campos numéricos/texto
+        inputSaldo = addField(panel, gbc, 0, 3);
+        inputValorGasto = addField(panel, gbc, 1, 3);
+        inputResultado = addField(panel, gbc, 2, 3);
         inputResultado.setEditable(false);
         inputResultado.setBackground(new Color(240,240,240));
-        inputDiasViagem = addField(panel, gbc, 2, 3);
 
-        addLabel(panel, gbc, 0, 4, "Companhia");
-        inputCompanhia = addField(panel, gbc, 0, 5);
+        // Linha 4 - Labels
+        addLabel(panel, gbc, 0, 4, "Dia de Chegada");
+        addLabel(panel, gbc, 1, 4, "Dia de Saída");
+        addLabel(panel, gbc, 2, 4, "Dias Viajando");
+
+        // Linha 5 - Campos data com máscara
+        inputDataChegada = createDateField(panel, gbc, 0, 5);
+        inputDataSaida = createDateField(panel, gbc, 1, 5);
+
+        inputDataChegada.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                atualizarDiasViajando();
+            }
+        });
+        inputDataSaida.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                atualizarDiasViajando();
+            }
+        });
+
+        // Dias viajando é campo somente leitura
+        inputDiasViagem = addField(panel, gbc, 2, 5);
+        inputDiasViagem.setEditable(false);
+        inputDiasViagem.setBackground(new Color(240,240,240));
 
         return panel;
+    }
+
+    // Método auxiliar para criar campo de data formatada
+    private JFormattedTextField createDateField(JPanel panel, GridBagConstraints gbc, int x, int y) {
+        JFormattedTextField dateField;
+        try {
+            MaskFormatter dateMask = new MaskFormatter("##/##/####");
+            dateMask.setPlaceholderCharacter('_');
+            dateField = new JFormattedTextField(dateMask);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            dateField = new JFormattedTextField();
+        }
+        dateField.setPreferredSize(new Dimension(250, 40));
+        styleField(dateField);
+        gbc.gridx = x;
+        gbc.gridy = y;
+        panel.add(dateField, gbc);
+        return dateField;
     }
 
     private void montarRodape() {
@@ -215,7 +269,7 @@ public class DetalhesViagemFrame {
         JScrollPane scroll = new JScrollPane(atividadesEntriesPanel,
                 JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scroll.setPreferredSize(new Dimension(800, 100));
+        scroll.setPreferredSize(new Dimension(800, 200)); // aumenta altura para caber mais campos
         atividadesPanel.add(scroll, BorderLayout.CENTER);
 
         JButton btnAddAtv = new JButton("Adicionar");
@@ -324,7 +378,8 @@ public class DetalhesViagemFrame {
         private final JButton btnRemove;
 
         private JTextField nomeField;
-        private JTextField horarioField;
+        private JFormattedTextField dataField;
+        private JFormattedTextField horarioField;
         private JTextField temaField;
         private JTextField nomeLocalField;
         private JTextField nomeRestauranteField;
@@ -345,7 +400,24 @@ public class DetalhesViagemFrame {
             panel.add(camposEspecificosPanel);
 
             nomeField = campo(150);
-            horarioField = campo(150);
+            try {
+                MaskFormatter timeMask = new MaskFormatter("##:##");
+                timeMask.setPlaceholderCharacter('_');
+                horarioField = new JFormattedTextField(timeMask);
+                horarioField.setPreferredSize(new Dimension(150, 30));
+                horarioField.setMaximumSize(new Dimension(150, 30));
+
+                MaskFormatter dateMask = new MaskFormatter("##/##/####");
+                dateMask.setPlaceholderCharacter('_');
+                dataField = new JFormattedTextField(dateMask);
+                dataField.setPreferredSize(new Dimension(150, 30));
+                dataField.setMaximumSize(new Dimension(150, 30));
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+                horarioField = new JFormattedTextField();
+                dataField = new JFormattedTextField();
+            }
             temaField = campo(150);
             nomeLocalField = campo(150);
             nomeRestauranteField = campo(150);
@@ -378,6 +450,10 @@ public class DetalhesViagemFrame {
 
             camposEspecificosPanel.add(new JLabel("Nome:"));
             camposEspecificosPanel.add(nomeField);
+            camposEspecificosPanel.add(new JLabel("Data:"));
+            camposEspecificosPanel.add(dataField);
+            camposEspecificosPanel.add(new JLabel("Horário:"));
+            camposEspecificosPanel.add(horarioField);
             camposEspecificosPanel.add(new JLabel("Horário:"));
             camposEspecificosPanel.add(horarioField);
             camposEspecificosPanel.add(new JLabel("Custo:"));
@@ -415,11 +491,12 @@ public class DetalhesViagemFrame {
         }
 
         // Métodos para preencher campos
-        public void setData(String tipo, String nome, String horario, String custo,
+        public void setData(String tipo, String nome, String data, String horario, String custo,
                             String tema, String local, String restaurante,
                             String culinaria, String prato) {
             tipoCombo.setSelectedItem(tipo);
             nomeField.setText(nome);
+            dataField.setText(data);
             horarioField.setText(horario);
             custoField.setText(custo);
             temaField.setText(tema);
@@ -429,6 +506,7 @@ public class DetalhesViagemFrame {
             pratoField.setText(prato);
             rebuildCampos();
         }
+
     }
 
     /* =====================  ENTRADA DE DESLOCAMENTO  ==================== */
@@ -655,11 +733,36 @@ public class DetalhesViagemFrame {
 
     /* ================== MÉTODOS PARA CARREGAR DADOS ================== */
     // Exemplo para popular campos com dados existentes - você deve adaptar conforme o modelo da sua aplicação
+
+    private void atualizarDiasViajando() {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            String dataChegadaStr = inputDataChegada.getText();
+            String dataSaidaStr = inputDataSaida.getText();
+
+            LocalDate dataChegada = LocalDate.parse(dataChegadaStr, formatter);
+            LocalDate dataSaida = LocalDate.parse(dataSaidaStr, formatter);
+
+            long dias = ChronoUnit.DAYS.between(dataChegada, dataSaida) + 1; // +1 para contar inclusive o dia de chegada
+
+            if (dias < 0) {
+                inputDiasViagem.setText("Erro: saída anterior chegada");
+            } else {
+                inputDiasViagem.setText(String.valueOf(dias));
+            }
+        } catch (Exception e) {
+            inputDiasViagem.setText("");
+        }
+    }
+
+
     public void carregarDadosViagem(
             String lugarPartida,
             String lugarChegada,
             String saldo,
             String valorGasto,
+            String dataChegada,
+            String dataSaida,
             String diasViagem,
             String companhia,
             List<HospedagemDados> listaHospedagem,
@@ -670,6 +773,8 @@ public class DetalhesViagemFrame {
         inputLugarChegada.setText(lugarChegada);
         inputSaldo.setText(saldo);
         inputValorGasto.setText(valorGasto);
+        inputDataChegada.setText(dataChegada);
+        inputDataSaida.setText(dataSaida);
         inputDiasViagem.setText(diasViagem);
         inputCompanhia.setText(companhia);
         atualizarResultado();
@@ -690,7 +795,7 @@ public class DetalhesViagemFrame {
         atividadeEntries.clear();
         for (AtividadeDados a : listaAtividades) {
             AtividadeEntry e = new AtividadeEntry();
-            e.setData(a.tipo, a.nome, a.horario, a.custo, a.tema, a.local, a.restaurante, a.culinaria, a.prato);
+            e.setData(a.tipo, a.nome, a.data, a.horario, a.custo, a.tema, a.local, a.restaurante, a.culinaria, a.prato);
             atividadeEntries.add(e);
             atividadesEntriesPanel.add(Box.createVerticalStrut(20));
             atividadesEntriesPanel.add(e.getPanel());
@@ -711,6 +816,7 @@ public class DetalhesViagemFrame {
         deslocamentoEntriesPanel.repaint();
     }
 
+
     /* ================== CLASSES DE DADOS SIMPLES PARA CARREGAR ================== */
     public static class HospedagemDados {
         public String nomeLocal, noites, valorDiaria;
@@ -720,12 +826,20 @@ public class DetalhesViagemFrame {
     }
 
     public static class AtividadeDados {
-        public String tipo, nome, horario, custo, tema, local, restaurante, culinaria, prato;
-        public AtividadeDados(String tipo, String nome, String horario, String custo, String tema,
-                              String local, String restaurante, String culinaria, String prato) {
-            this.tipo = tipo; this.nome = nome; this.horario = horario; this.custo = custo;
-            this.tema = tema; this.local = local; this.restaurante = restaurante;
-            this.culinaria = culinaria; this.prato = prato;
+        public String tipo, nome, data, horario, custo, tema, local, restaurante, culinaria, prato;
+
+        public AtividadeDados(String tipo, String nome, String data, String horario, String tema,
+                              String local, String restaurante, String culinaria, String prato, String custo) {
+            this.tipo = tipo;
+            this.nome = nome;
+            this.data = data;
+            this.horario = horario;
+            this.tema = tema;
+            this.local = local;
+            this.restaurante = restaurante;
+            this.culinaria = culinaria;
+            this.prato = prato;
+            this.custo = custo;
         }
     }
 

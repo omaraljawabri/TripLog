@@ -3,8 +3,10 @@ package frontend.framesUI;
 import backend.main.entities.Viajante;
 
 import javax.swing.*;
+import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,8 +18,9 @@ public class CadastroViagemFrame {
     private JTextField inputLugarPartida;
     private JTextField inputLugarChegada;
     private JTextField inputSaldo;
-    private JTextField inputDiasViagem;
     private JTextField inputCompanhia;
+    private JFormattedTextField inputDataSaida;
+    private JFormattedTextField inputDataChegada;
 
     private JPanel hospedagemEntriesPanel;
     private List<HospedagemEntry> hospedagemEntries;
@@ -50,23 +53,19 @@ public class CadastroViagemFrame {
         montarRodape();
 
         // Tornar a janela rolável e responsiva:
-        // Envolve mainPanel dentro de JScrollPane e substitui mainPanel pelo scroll
         JScrollPane scrollPane = new JScrollPane(mainPanel,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
-        // Painel externo para layout responsivo, com BoxLayout vertical
         JPanel wrapper = new JPanel();
         wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
         wrapper.setBackground(Color.WHITE);
         wrapper.add(scrollPane);
 
-        // Trocar mainPanel para o wrapper (para o uso externo)
         this.mainPanelWrapper = wrapper;
     }
 
-    // Painel wrapper para exibição com scroll
     private JPanel mainPanelWrapper;
 
     /* ----------------------------- TOPO ----------------------------- */
@@ -97,7 +96,6 @@ public class CadastroViagemFrame {
 
     /* ---------------------------- CENTRO --------------------------- */
     private void montarCentro() {
-
         JPanel centerPanel = new JPanel();
         centerPanel.setBackground(Color.WHITE);
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
@@ -114,7 +112,6 @@ public class CadastroViagemFrame {
 
         centerPanel.add(montarDeslocamentos());
 
-        // Envolver em painel com padding e fundo branco
         JPanel centerWrapper = new JPanel(new BorderLayout());
         centerWrapper.setBackground(Color.WHITE);
         centerWrapper.add(centerPanel, BorderLayout.NORTH);
@@ -138,13 +135,30 @@ public class CadastroViagemFrame {
         inputLugarChegada = addField(panel, gbc, 1, 1);
         inputSaldo        = addField(panel, gbc, 2, 1);
 
-        addLabel(panel, gbc, 0, 2, "Dias de Viagem");
-        addLabel(panel, gbc, 1, 2, "Companhia");
+        addLabel(panel, gbc, 0, 2, "Data de Saída");
+        addLabel(panel, gbc, 1, 2, "Data de Chegada");
+        addLabel(panel, gbc, 2, 2, "Companhia");
 
-        inputDiasViagem = addField(panel, gbc, 0, 3);
-        inputCompanhia  = addField(panel, gbc, 1, 3);
+        inputDataSaida    = addMaskedDateField(panel, gbc, 0, 3);
+        inputDataChegada  = addMaskedDateField(panel, gbc, 1, 3);
+        inputCompanhia    = addField(panel, gbc, 2, 3);
 
         return panel;
+    }
+
+    private JFormattedTextField addMaskedDateField(JPanel p, GridBagConstraints gbc, int x, int y) {
+        gbc.gridx = x; gbc.gridy = y;
+        try {
+            MaskFormatter dateMask = new MaskFormatter("##/##/####");
+            dateMask.setPlaceholderCharacter('_');
+            JFormattedTextField dateField = new JFormattedTextField(dateMask);
+            styleField(dateField);
+            p.add(dateField, gbc);
+            return dateField;
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return new JFormattedTextField();
+        }
     }
 
     // ---------- NOVO: montar rodapé com botões ----------
@@ -299,8 +313,9 @@ public class CadastroViagemFrame {
         private JComboBox<String> tipoCombo;
         private JButton btnRemove;
 
+        private JFormattedTextField dataField;
         private JTextField nomeField;
-        private JTextField horarioField;
+        private JFormattedTextField horarioField;
         private JTextField temaField;
         private JTextField nomeLocalField;
         private JTextField nomeRestauranteField;
@@ -321,7 +336,24 @@ public class CadastroViagemFrame {
             panel.add(camposEspecificosPanel);
 
             nomeField            = campo(150);
-            horarioField         = campo(150);
+            try {
+                MaskFormatter timeMask = new MaskFormatter("##:##");
+                timeMask.setPlaceholderCharacter('_');
+                horarioField = new JFormattedTextField(timeMask);
+                horarioField.setPreferredSize(new Dimension(150, 30));
+                horarioField.setMaximumSize(new Dimension(150, 30));
+
+                MaskFormatter dateMask = new MaskFormatter("##/##/####");
+                dateMask.setPlaceholderCharacter('_');
+                dataField = new JFormattedTextField(dateMask);
+                dataField.setPreferredSize(new Dimension(150, 30));
+                dataField.setMaximumSize(new Dimension(150, 30));
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+                horarioField = new JFormattedTextField();
+                dataField = new JFormattedTextField();
+            }
             temaField            = campo(150);
             nomeLocalField       = campo(150);
             nomeRestauranteField = campo(150);
@@ -354,6 +386,8 @@ public class CadastroViagemFrame {
 
             camposEspecificosPanel.add(new JLabel("Nome:"));
             camposEspecificosPanel.add(nomeField);
+            camposEspecificosPanel.add(new JLabel("Data:"));
+            camposEspecificosPanel.add(dataField);
             camposEspecificosPanel.add(new JLabel("Horário:"));
             camposEspecificosPanel.add(horarioField);
             camposEspecificosPanel.add(new JLabel("Custo:"));
