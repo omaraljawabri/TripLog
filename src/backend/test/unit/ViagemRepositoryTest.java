@@ -316,7 +316,6 @@ class ViagemRepositoryTest {
 
         viagem1.setAtividades(atividades1);
         viagem1.setSaldo(1000.0);
-        viagem1.setDiasPercorridos(4);
         viagem1.setEmailViajante("fulano@example.com");
         return viagem1;
     }
@@ -352,7 +351,6 @@ class ViagemRepositoryTest {
 
         viagem2.setAtividades(atividades2);
         viagem2.setSaldo(800.0);
-        viagem2.setDiasPercorridos(3);
         viagem2.setEmailViajante("fulano@example.com");
         return viagem2;
     }
@@ -387,7 +385,6 @@ class ViagemRepositoryTest {
 
         viagem3.setAtividades(atividades3);
         viagem3.setSaldo(1500.0);
-        viagem3.setDiasPercorridos(5);
         viagem3.setEmailViajante("fulano@example.com");
         return viagem3;
     }

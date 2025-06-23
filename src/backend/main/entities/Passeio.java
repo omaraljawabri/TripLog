@@ -13,8 +13,8 @@ public class Passeio extends Atividade implements Serializable {
         this.id = Passeio.contador;
     }
 
-    public Passeio(String nome, double gasto, LocalDateTime horario, String nomeLocal) {
-        super(nome, gasto, horario);
+    public Passeio(String nome, double gasto, LocalDateTime data, String nomeLocal) {
+        super(nome, gasto, data);
         Passeio.contador++;
         this.id = Passeio.contador;
         this.nomeLocal = nomeLocal;

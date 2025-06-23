@@ -1,12 +1,17 @@
 package frontend.framesUI;
 
-import backend.main.entities.Viajante;
+import backend.main.entities.*;
+import backend.main.repositories.ViagemRepository;
+import backend.main.services.ViagemService;
 
 import javax.swing.*;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,13 +28,13 @@ public class CadastroViagemFrame {
     private JFormattedTextField inputDataChegada;
 
     private JPanel hospedagemEntriesPanel;
-    private List<HospedagemEntry> hospedagemEntries;
+    private List<HospedagemEntry> hospedagemEntries = new ArrayList<>();
 
     private JPanel atividadesEntriesPanel;
-    private List<AtividadeEntry> atividadeEntries;
+    private List<AtividadeEntry> atividadeEntries = new ArrayList<>();
 
     private JPanel deslocamentoEntriesPanel;
-    private List<DeslocamentoEntry> deslocamentoEntries;
+    private List<DeslocamentoEntry> deslocamentoEntries = new ArrayList<>();
 
     // Botões Salvar e Cancelar do rodapé
     private JButton btnSalvar;
@@ -64,6 +69,86 @@ public class CadastroViagemFrame {
         wrapper.add(scrollPane);
 
         this.mainPanelWrapper = wrapper;
+
+        btnSalvar.addActionListener(e -> {
+            boolean dataValida = true;
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            for (AtividadeEntry entry : atividadeEntries) {
+                try {
+                    String textoData = entry.dataField.getText();
+                    String textoHora = entry.horarioField.getText();
+                    LocalDateTime.parse(textoData+" "+textoHora, formatter);
+                } catch (Exception ex) {
+                    dataValida = false;
+                    JOptionPane.showMessageDialog(mainPanel,
+                            "Data inválida em uma atividade! Use o formato: dd/MM/yyyy HH:mm",
+                            "Erro de validação", JOptionPane.ERROR_MESSAGE);
+                    break;
+                }
+            }
+
+            if (dataValida) {
+                try {
+                    String lugarDePartida = inputLugarPartida.getText();
+                    String lugarDeChegada = inputLugarChegada.getText();
+                    String dataSaida = inputDataSaida.getText();
+                    String dataChegada = inputDataChegada.getText();
+                    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                    LocalDate dataSaidaDate = LocalDate.parse(dataSaida, dateTimeFormatter);
+                    LocalDate dataChegadaDate = LocalDate.parse(dataChegada, dateTimeFormatter);
+                    double saldo = Double.parseDouble(inputSaldo.getText());
+                    String companhia = inputCompanhia.getText();
+                    List<Deslocamento> deslocamentos = new ArrayList<>();
+                    for (DeslocamentoEntry deslocamentoEntry : deslocamentoEntries){
+                        double custo = Double.parseDouble(deslocamentoEntry.custoField.getText());
+                        String meioTransporte = deslocamentoEntry.meioTransporteField.getText();
+                        Deslocamento deslocamento = new Deslocamento(meioTransporte, custo);
+                        deslocamentos.add(deslocamento);
+                    }
+                    List<Hospedagem> hospedagens = new ArrayList<>();
+                    for (HospedagemEntry hospedagemEntry : hospedagemEntries){
+                        String nomeLocalHospedagem = hospedagemEntry.nomeLocalField.getText();
+                        int numeroDeNoites = Integer.parseInt(hospedagemEntry.noitesField.getText());
+                        double valorDiaria = Double.parseDouble(hospedagemEntry.valorDiariaField.getText());
+                        Hospedagem hospedagem = new Hospedagem(nomeLocalHospedagem, numeroDeNoites, valorDiaria);
+                        hospedagens.add(hospedagem);
+                    }
+                    List<Atividade> atividades = new ArrayList<>();
+                    for (AtividadeEntry atividadeEntry : atividadeEntries){
+                        String textoData = atividadeEntry.dataField.getText();
+                        String textoHora = atividadeEntry.horarioField.getText();
+                        LocalDateTime dataAtividade = LocalDateTime.parse(textoData + " " + textoHora, formatter);
+                        double gastoAtividade = Double.parseDouble(atividadeEntry.custoField.getText());
+                        String nomeAtividade = atividadeEntry.nomeField.getText();
+                        String tipoAtividade = String.valueOf(atividadeEntry.tipoCombo.getSelectedItem());
+
+                        if (tipoAtividade.equals("Evento")){
+                            String temaEvento = atividadeEntry.temaField.getText();
+                            Evento evento = new Evento(nomeAtividade, gastoAtividade, dataAtividade, temaEvento);
+                            atividades.add(evento);
+                        } else if (tipoAtividade.equals("Passeio")){
+                            String nomeLocalPasseio = atividadeEntry.nomeLocalField.getText();
+                            Passeio passeio = new Passeio(nomeAtividade, gastoAtividade, dataAtividade, nomeLocalPasseio);
+                            atividades.add(passeio);
+                        } else if (tipoAtividade.equals("Restaurante")){
+                            String nomeRestaurante = atividadeEntry.nomeRestauranteField.getText();
+                            String culinariaRestaurante = atividadeEntry.culinariaField.getText();
+                            String pratoRestaurante = atividadeEntry.pratoField.getText();
+                            Restaurante restaurante = new Restaurante(nomeAtividade, gastoAtividade, dataAtividade, nomeRestaurante, culinariaRestaurante, pratoRestaurante);
+                            atividades.add(restaurante);
+                        }
+                    }
+                    Viagem viagem = new Viagem(lugarDePartida, lugarDeChegada, deslocamentos, hospedagens, saldo, companhia, atividades, viajante.getEmail(), dataChegadaDate, dataSaidaDate);
+                    ViagemRepository viagemRepository = new ViagemRepository("viagem.ser");
+                    ViagemService viagemService = new ViagemService(viagemRepository);
+                    viagemService.adicionarViagem(viagem, viajante);
+                    JOptionPane.showMessageDialog(mainPanel, "Viagem cadastrada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(mainPanel, "Erro ao fazer cadastro de viagem! Credenciais inválidas, tente novamente!", "Erro", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
     }
 
     private JPanel mainPanelWrapper;
@@ -278,14 +363,25 @@ public class CadastroViagemFrame {
         private final JPanel panel;
         private final JButton btnRemove;
 
-        public HospedagemEntry() {
+        private JTextField nomeLocalField;
+        private JTextField noitesField;
+        private JTextField valorDiariaField;
 
+        public HospedagemEntry() {
             panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
             panel.setBackground(Color.WHITE);
 
-            panel.add(new JLabel("Nome Local:"));  panel.add(campo(200));
-            panel.add(new JLabel("Noites:"));      panel.add(campo(60));
-            panel.add(new JLabel("Valor Diária:"));panel.add(campo(80));
+            panel.add(new JLabel("Nome Local:"));
+            nomeLocalField = campo(200);
+            panel.add(nomeLocalField);
+
+            panel.add(new JLabel("Noites:"));
+            noitesField = campo(60);
+            panel.add(noitesField);
+
+            panel.add(new JLabel("Valor Diária:"));
+            valorDiariaField = campo(80);
+            panel.add(valorDiariaField);
 
             btnRemove = new JButton("Remover");
             styleRemoveButton(btnRemove);
@@ -304,8 +400,10 @@ public class CadastroViagemFrame {
             f.setPreferredSize(new Dimension(width, 30));
             return f;
         }
+
         public JPanel getPanel() { return panel; }
     }
+
 
     /* =====================  ENTRADA DE ATIVIDADE  ==================== */
     private class AtividadeEntry {

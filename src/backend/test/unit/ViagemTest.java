@@ -56,7 +56,6 @@ class ViagemTest {
 
         viagem1.setAtividades(atividades1);
         viagem1.setSaldo(1000.0);
-        viagem1.setDiasPercorridos(4);
         viagem1.setEmailViajante("fulano@example.com");
         return viagem1;
     }

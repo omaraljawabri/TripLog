@@ -13,8 +13,8 @@ public class Evento extends Atividade implements Serializable {
         this.id = Evento.contador;
     }
 
-    public Evento(String nome, double gasto, LocalDateTime horario, String tema) {
-        super(nome, gasto, horario);
+    public Evento(String nome, double gasto, LocalDateTime data, String tema) {
+        super(nome, gasto, data);
         Evento.contador++;
         this.id = Evento.contador;
         this.tema = tema;
