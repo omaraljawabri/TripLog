@@ -148,9 +148,7 @@ public class Viagem implements Serializable {
         }
 
         for (Atividade atividade : atividades){
-            for (Gasto gasto : atividade.getGastos()){
-                gastos += gasto.getValor();
-            }
+            gastos += atividade.getGasto();
         }
 
         return gastos;

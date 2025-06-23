@@ -2,7 +2,6 @@ package backend.main.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class Passeio extends Atividade implements Serializable {
     private static int contador;
@@ -14,8 +13,8 @@ public class Passeio extends Atividade implements Serializable {
         this.id = Passeio.contador;
     }
 
-    public Passeio(String nome, List<Gasto> gastos, LocalDateTime horario, String nomeLocal) {
-        super(nome, gastos, horario);
+    public Passeio(String nome, double gasto, LocalDateTime horario, String nomeLocal) {
+        super(nome, gasto, horario);
         Passeio.contador++;
         this.id = Passeio.contador;
         this.nomeLocal = nomeLocal;

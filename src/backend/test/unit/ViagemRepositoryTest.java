@@ -302,15 +302,15 @@ class ViagemRepositoryTest {
 
         List<Atividade> atividades1 = new ArrayList<>();
         atividades1.add(new Evento("Festival de Verão",
-                List.of(new Gasto(150.0, "Entrada")),
+                150.0,
                 LocalDateTime.of(2025, 6, 10, 18, 0),
                 "Música"));
         atividades1.add(new Passeio("Pelourinho Tour",
-                List.of(new Gasto(30.0, "Guia turístico")),
+                30.0,
                 LocalDateTime.of(2025, 6, 11, 10, 0),
                 "Centro Histórico"));
         atividades1.add(new Restaurante("Almoço na Yemanjá",
-                List.of(new Gasto(80.0, "Refeição")),
+                80.0,
                 LocalDateTime.of(2025, 6, 11, 13, 0),
                 "Restaurante Yemanjá", "Baiana", "Moqueca"));
 
@@ -338,15 +338,15 @@ class ViagemRepositoryTest {
 
         List<Atividade> atividades2 = new ArrayList<>();
         atividades2.add(new Evento("Show de Rock",
-                List.of(new Gasto(120.0, "Ingresso")),
+                120.0,
                 LocalDateTime.of(2025, 7, 20, 20, 0),
                 "Música"));
         atividades2.add(new Passeio("Praia da Joaquina",
-                List.of(new Gasto(25.0, "Aluguel de guarda-sol")),
+                25.0,
                 LocalDateTime.of(2025, 7, 21, 9, 0),
                 "Litoral"));
         atividades2.add(new Restaurante("Cantina Italiana",
-                List.of(new Gasto(70.0, "Almoço")),
+                70.0,
                 LocalDateTime.of(2025, 7, 21, 13, 0),
                 "Cantina Italiana", "Italiana", "Lasanha"));
 
@@ -373,15 +373,15 @@ class ViagemRepositoryTest {
 
         List<Atividade> atividades3 = new ArrayList<>();
         atividades3.add(new Evento("Congresso de Tecnologia",
-                List.of(new Gasto(200.0, "Inscrição")),
+                200.0,
                 LocalDateTime.of(2025, 8, 15, 9, 0),
                 "Tecnologia"));
         atividades3.add(new Passeio("Jardim Botânico",
-                List.of(new Gasto(10.0, "Entrada")),
+                10.0,
                 LocalDateTime.of(2025, 8, 16, 15, 0),
                 "Parque"));
         atividades3.add(new Restaurante("Jantar Alemão",
-                List.of(new Gasto(90.0, "Jantar")),
+                90.0,
                 LocalDateTime.of(2025, 8, 16, 19, 30),
                 "Bar do Alemão", "Alemã", "Eisbein"));
 

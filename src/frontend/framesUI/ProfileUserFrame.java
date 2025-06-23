@@ -1,6 +1,8 @@
 package frontend.framesUI;
 
 import backend.main.entities.Viajante;
+import backend.main.repositories.ViajanteRepository;
+import backend.main.services.ViajanteService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -86,24 +88,6 @@ public class ProfileUserFrame {
         btnConfirmarSenha.setPreferredSize(new Dimension(220, 42));
         dadosPanel.add(btnConfirmarSenha, gbc);
 
-        // Listener de exemplo — aqui você validaria e atualizaria a senha.
-        btnConfirmarSenha.addActionListener(e -> {
-            if (String.valueOf(pwdNovaField.getPassword())
-                    .equals(String.valueOf(pwdConfirmaField.getPassword()))) {
-                JOptionPane.showMessageDialog(mainPanel,
-                        "Senha alterada com sucesso!", "Sucesso",
-                        JOptionPane.INFORMATION_MESSAGE);
-                // TODO: chamar serviço de alteração de senha
-                pwdAntigaField.setText("");
-                pwdNovaField.setText("");
-                pwdConfirmaField.setText("");
-            } else {
-                JOptionPane.showMessageDialog(mainPanel,
-                        "A confirmação não coincide com a nova senha!",
-                        "Erro", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
         /* Botão Logout (vermelho) */
         gbc.gridy      = row++;
         gbc.anchor     = GridBagConstraints.LINE_START;
@@ -145,6 +129,35 @@ public class ProfileUserFrame {
         footerPanel.add(btnInicio);
         footerPanel.add(btnListaViagens);
         mainPanel.add(footerPanel, BorderLayout.SOUTH);
+
+        btnConfirmarSenha.addActionListener(e -> {
+            try{
+                String novaSenha = String.valueOf(pwdNovaField.getPassword());
+                String confirmarSenha = String.valueOf(pwdConfirmaField.getPassword());
+                String senhaAntiga = String.valueOf(pwdAntigaField.getPassword());
+
+                if (nomeField.getText().isEmpty() || novaSenha.isEmpty() ||senhaAntiga.isEmpty() ||
+                        confirmarSenha.isEmpty()){
+                    JOptionPane.showMessageDialog(mainPanel, "Todos os campos devem ser preenchidos", "Erro", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                if (!novaSenha.equals(confirmarSenha)){
+                    JOptionPane.showMessageDialog(mainPanel,
+                            "A confirmação não coincide com a nova senha!",
+                            "Erro", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                ViajanteRepository viajanteRepository = new ViajanteRepository("viajante.ser");
+                ViajanteService viajanteService = new ViajanteService(viajanteRepository);
+
+                viajanteService.editarViajante(viajante.getEmail(), nomeField.getText(), senhaAntiga, novaSenha);
+                JOptionPane.showMessageDialog(mainPanel, "Credenciais atualizadas com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex){
+                JOptionPane.showMessageDialog(mainPanel, "Erro ao alterar credenciais, tente novamente!", "Erro", JOptionPane.ERROR_MESSAGE);
+            }
+        });
     }
 
     /* -------------------- Helpers de criação -------------------- */

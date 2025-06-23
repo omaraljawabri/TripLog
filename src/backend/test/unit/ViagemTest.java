@@ -42,15 +42,15 @@ class ViagemTest {
 
         List<Atividade> atividades1 = new ArrayList<>();
         atividades1.add(new Evento("Festival de Verão",
-                List.of(new Gasto(150.0, "Entrada")),
+                150.0,
                 LocalDateTime.of(2025, 6, 10, 18, 0),
                 "Música"));
         atividades1.add(new Passeio("Pelourinho Tour",
-                List.of(new Gasto(30.0, "Guia turístico")),
+                30.0,
                 LocalDateTime.of(2025, 6, 11, 10, 0),
                 "Centro Histórico"));
         atividades1.add(new Restaurante("Almoço na Yemanjá",
-                List.of(new Gasto(80.0, "Refeição")),
+                80.0,
                 LocalDateTime.of(2025, 6, 11, 13, 0),
                 "Restaurante Yemanjá", "Baiana", "Moqueca"));
 
