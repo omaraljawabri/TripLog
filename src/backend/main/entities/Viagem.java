@@ -2,6 +2,7 @@ package backend.main.entities;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -142,6 +143,13 @@ public class Viagem implements Serializable {
         }
 
         return gastos;
+    }
+
+    public int calcularDiasDeViagem() {
+        if (this.dataChegada != null && this.dataTermino != null) {
+            return (int) ChronoUnit.DAYS.between(this.dataChegada, this.dataTermino);
+        }
+        return 0;
     }
 
     @Override
