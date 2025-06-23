@@ -121,6 +121,14 @@ public class HomeFrame {
         ajustarLayout( /* inicial */ 800);
     }
 
+    public void setCadastrarViagemButtonListener(java.awt.event.ActionListener listener) {
+        cadastrarViagemButton.addActionListener(listener);
+    }
+
+    public void setMinhasViagensButtonListener(java.awt.event.ActionListener listener) {
+        minhasViagensButton.addActionListener(listener);
+    }
+
     /* ---------- Responsividade: ajusta imagem, fontes, margens ---------- */
     private void ajustarLayout(int larguraPainel) {
 

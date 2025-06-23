@@ -16,79 +16,112 @@ public class MainFrame extends JFrame {
     private CadastroFrame cadastro;
     private CadastroViagemFrame cadastroViagem;
     private HomeFrame home;
+    private ProfileUserFrame perfil;  // Tela de perfil
+
+    private Viajante usuarioLogado;
 
     public MainFrame() {
-        // Configurações da janela principal
         setTitle("Sistema de Acesso");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(650, 500);
-        setLocationRelativeTo(null); // centraliza na tela
+        setLocationRelativeTo(null);
 
-        // CardLayout para alternar entre telas
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
 
-        // Instanciando telas
         login = new LoginFrame(this);
         cadastro = new CadastroFrame();
         cadastroViagem = new CadastroViagemFrame();
 
-        // Instancia home depois, quando for mostrar, para passar o viajante
+        // Inicialmente home e perfil nulos
+        home = null;
+        perfil = null;
 
-        // Adiciona os painéis ao cardPanel
+        // Adiciona telas fixas
         cardPanel.add(login.getPanel(), "login");
         cardPanel.add(cadastro.getPanel(), "cadastro");
         cardPanel.add(cadastroViagem.getPanel(), "cadastroViagem");
 
-        // Define o painel principal como cardPanel
         setContentPane(cardPanel);
-
-        // MOSTRA A TELA DE LOGIN PRIMEIRO
         cardLayout.show(cardPanel, "login");
 
-        // Lógica de troca de telas
+        // Navegação login <-> cadastro
         login.getTelaDeCadastroButton().addActionListener(e -> cardLayout.show(cardPanel, "cadastro"));
         cadastro.getTelaDeLoginButton().addActionListener(e -> cardLayout.show(cardPanel, "login"));
 
-        // Exemplo: para abrir tela de cadastro de viagem (você deve disparar isso da sua lógica)
-        // cadastroViagem.addCancelarListener(e -> voltarParaHomeOuLogin());
-
-        // Opcional: Se quiser um método para abrir cadastro de viagem
-        // abrirCadastroViagem();
-
-        // *** Exemplo de como configurar o botão Cancelar do cadastro de viagem ***
+        // Cancelar cadastro de viagem volta para home ou login
         cadastroViagem.addCancelarListener(e -> {
-            // Aqui decide para onde voltar, exemplo volta para login
-            cardLayout.show(cardPanel, "login");
+            if (usuarioLogado != null) {
+                abrirHome(usuarioLogado);
+            } else {
+                cardLayout.show(cardPanel, "login");
+            }
         });
     }
 
-    // Método para mostrar qualquer tela pelo nome
+    // Mostra tela pelo nome no cardLayout
     public void mostrarTela(String nomeTela) {
         cardLayout.show(cardPanel, nomeTela);
     }
 
-    // Abrir home com viajante, substituindo o conteúdo da janela (não CardLayout)
+    // Abre tela Home e configura botões para navegação
     public void abrirHome(Viajante viajante) {
-        home = new HomeFrame(viajante);
-        setContentPane(home.getPanel());
+        this.usuarioLogado = viajante;
+
+        if (home == null) {
+            home = new HomeFrame(viajante);
+
+            // Configura listeners dos botões do HomeFrame
+            home.setCadastrarViagemButtonListener(e -> abrirCadastroViagem());
+            home.setMinhasViagensButtonListener(e -> abrirPerfil(usuarioLogado));
+
+            cardPanel.add(home.getPanel(), "home");
+        }
+        cardLayout.show(cardPanel, "home");
         revalidate();
         repaint();
     }
 
-    // Exemplo de método para abrir a tela de cadastro de viagem
+    // Abre tela cadastro viagem
     public void abrirCadastroViagem() {
         cardLayout.show(cardPanel, "cadastroViagem");
     }
 
-    // Caso queira voltar para home ou login (exemplo)
+    // Abre tela perfil do usuário, configura botões de navegação e logout
+    public void abrirPerfil(Viajante viajante) {
+        this.usuarioLogado = viajante;
+
+        if (perfil != null) {
+            cardPanel.remove(perfil.getPanel());
+        }
+        perfil = new ProfileUserFrame(viajante);
+
+        // Botão "Voltar para início" volta para Home
+        perfil.setBtnInicioListener(this, usuarioLogado);
+
+        // Botão logout volta para login e limpa usuário logado
+        perfil.getBtnLogout().addActionListener(e -> {
+            JOptionPane.showMessageDialog(this, "Logout efetuado!");
+            usuarioLogado = null;
+            cardLayout.show(cardPanel, "login");
+        });
+
+        cardPanel.add(perfil.getPanel(), "perfil");
+        cardLayout.show(cardPanel, "perfil");
+        revalidate();
+        repaint();
+    }
+
+    // Método auxiliar para voltar para home ou login conforme estado de login
     private void voltarParaHomeOuLogin() {
-        // Aqui você pode controlar lógica para voltar para home ou login
-        cardLayout.show(cardPanel, "login");
+        if (usuarioLogado != null) {
+            abrirHome(usuarioLogado);
+        } else {
+            cardLayout.show(cardPanel, "login");
+        }
     }
 
     public static void main(String[] args) throws UnsupportedLookAndFeelException {
-        // Tema FlatLaf com personalização
         FlatLightLaf.setup();
 
         UIManager.put("Button.arc", 20);
