@@ -8,6 +8,7 @@ public abstract class Atividade implements Serializable {
     private double gasto;
     private LocalDateTime data;
 
+
     public Atividade() {
     }
 
@@ -28,4 +29,6 @@ public abstract class Atividade implements Serializable {
     public LocalDateTime getData() {
         return data;
     }
+
+
 }

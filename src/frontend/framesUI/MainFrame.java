@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import backend.main.entities.Viagem;
 
 public class MainFrame extends JFrame {
 
@@ -21,7 +22,7 @@ public class MainFrame extends JFrame {
     private ListaDeViagensFrame listaDeViagensFrame;
 
     private Viajante usuarioLogado;
-    private final List<ListaDeViagensFrame.Viagem> viagens = new ArrayList<>();
+    private final List<Viagem> viagens = new ArrayList<>();
 
     public MainFrame() {
         setTitle("Sistema de Acesso");
@@ -114,21 +115,23 @@ public class MainFrame extends JFrame {
 
     public void abrirListaDeViagens() {
         listaDeViagensFrame = new ListaDeViagensFrame(
-                viagens,
-                viagem -> JOptionPane.showMessageDialog(this, "Abrindo detalhes de: " + viagem.getLugarChegada()),
+                usuarioLogado,                          // Viajante
+                usuarioLogado.getViagens(),            // Lista de viagens dele
+                viagem -> JOptionPane.showMessageDialog(this, "Abrindo detalhes de: " + viagem.getLugarDeChegada()),
                 viagem -> {
-                    JOptionPane.showMessageDialog(this, "Viagem para " + viagem.getLugarChegada() + " excluída!");
-                    viagens.remove(viagem);
+                    JOptionPane.showMessageDialog(this, "Viagem para " + viagem.getLugarDeChegada() + " excluída!");
+                    usuarioLogado.getViagens().remove(viagem);
+                    listaDeViagensFrame.atualizarListaPublic(); // Atualiza após remoção
                 },
                 e -> abrirPerfil(usuarioLogado),
                 e -> abrirCadastroViagem()
         );
 
-        cardPanel.add(listaDeViagensFrame.getPanel(), "listaViagens");
-        cardLayout.show(cardPanel, "listaViagens");
+        setContentPane(listaDeViagensFrame.getPanel());
         revalidate();
         repaint();
     }
+
 
     private void voltarParaHomeOuLogin() {
         if (usuarioLogado != null) {

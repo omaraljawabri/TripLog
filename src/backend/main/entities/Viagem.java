@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.format.DateTimeFormatter;
 
 public class Viagem implements Serializable {
     private static int contador;
@@ -124,6 +125,8 @@ public class Viagem implements Serializable {
         return dataTermino;
     }
 
+
+
     public void setDataTermino(LocalDate dataTermino) {
         this.dataTermino = dataTermino;
     }
@@ -151,6 +154,85 @@ public class Viagem implements Serializable {
         }
         return 0;
     }
+
+    public List<frontend.framesUI.DetalhesViagemFrame.HospedagemDados> getHospedagensAsDados() {
+        List<frontend.framesUI.DetalhesViagemFrame.HospedagemDados> dados = new ArrayList<>();
+        for (Hospedagem h : hospedagens) {
+            dados.add(new frontend.framesUI.DetalhesViagemFrame.HospedagemDados(
+                    h.getNomeLocalHospedagem(),
+                    String.valueOf(h.getNumeroDeNoites()),
+                    String.format("R$ %.2f", h.getValorDiaria())
+            ));
+        }
+        return dados;
+    }
+
+    // Retorna lista de dados de atividades para a UI
+
+
+    public List<frontend.framesUI.DetalhesViagemFrame.AtividadeDados> getAtividadesAsDados() {
+        List<frontend.framesUI.DetalhesViagemFrame.AtividadeDados> dados = new ArrayList<>();
+
+        // Formatadores para data e hora
+        DateTimeFormatter formatadorData = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter formatadorHora = DateTimeFormatter.ofPattern("HH:mm");
+
+        for (Atividade a : atividades) {
+            String tipo = a.getClass().getSimpleName();
+            String tema = "";
+            String local = "";
+            String restaurante = "";
+            String culinaria = "";
+            String prato = "";
+
+            if (a instanceof Restaurante) {
+                Restaurante r = (Restaurante) a;
+                restaurante = r.getNomeRestaurante();
+                culinaria = r.getCulinaria();
+                prato = r.getPrato();
+            }
+
+            // Extrair data e horário a partir do LocalDateTime
+            String data = "";
+            String horario = "";
+            if (a.getData() != null) {
+                data = a.getData().toLocalDate().format(formatadorData);
+                horario = a.getData().toLocalTime().format(formatadorHora);
+            }
+
+            String gasto = String.format("R$ %.2f", a.getGasto());
+
+            dados.add(new frontend.framesUI.DetalhesViagemFrame.AtividadeDados(
+                    tipo,
+                    a.getNome(),
+                    data,
+                    horario,
+                    tema,
+                    local,
+                    restaurante,
+                    culinaria,
+                    prato,
+                    gasto
+            ));
+        }
+
+        return dados;
+    }
+
+
+
+    public List<frontend.framesUI.DetalhesViagemFrame.DeslocamentoDados> getDeslocamentosAsDados() {
+        List<frontend.framesUI.DetalhesViagemFrame.DeslocamentoDados> dados = new ArrayList<>();
+        for (Deslocamento d : deslocamentos) {
+            dados.add(new frontend.framesUI.DetalhesViagemFrame.DeslocamentoDados(
+                    d.getMeioDeTransporte(),
+                    String.format("R$ %.2f", d.getCusto())
+            ));
+        }
+        return dados;
+    }
+
+
 
     @Override
     public String toString() {
