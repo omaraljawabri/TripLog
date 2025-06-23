@@ -7,15 +7,15 @@ import java.util.List;
 public abstract class Atividade implements Serializable {
     private String nome;
     private List<Gasto> gastos;
-    private LocalDateTime horario;
+    private LocalDateTime data;
 
     public Atividade() {
     }
 
-    public Atividade(String nome, List<Gasto> gastos, LocalDateTime horario) {
+    public Atividade(String nome, List<Gasto> gastos, LocalDateTime data) {
         this.nome = nome;
         this.gastos = gastos;
-        this.horario = horario;
+        this.data = data;
     }
 
     public String getNome() {
@@ -26,7 +26,7 @@ public abstract class Atividade implements Serializable {
         return gastos;
     }
 
-    public LocalDateTime getHorario() {
-        return horario;
+    public LocalDateTime getData() {
+        return data;
     }
 }
