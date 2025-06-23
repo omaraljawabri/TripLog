@@ -4,6 +4,7 @@ import backend.main.entities.Viajante;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 /**
  * Tela de perfil do usuário com campos centralizados e responsivos.
@@ -256,12 +257,24 @@ public class ProfileUserFrame {
      * Configura listener para o botão de voltar para o início.
      * Recebe JFrame pai e o objeto Viajante para criar a tela Home.
      */
-    public void setBtnInicioListener(JFrame framePai, Viajante viajante) {
-        btnInicio.addActionListener(e -> {
-            HomeFrame home = new HomeFrame(viajante);
-            framePai.setContentPane(home.getPanel());
+    public void setBtnInicioListener(Runnable callback) {
+        btnInicio.addActionListener(e -> callback.run());
+    }
+
+    public void setBtnListaViagensListener(JFrame framePai, List<ListaDeViagensFrame.Viagem> viagens, Runnable abrirPerfilCallback, Runnable abrirCadastroViagemCallback) {
+        btnListaViagens.addActionListener(e -> {
+            ListaDeViagensFrame listaFrame = new ListaDeViagensFrame(
+                    viagens,
+                    viagem -> JOptionPane.showMessageDialog(framePai, "Detalhes da viagem para " + viagem.getLugarChegada()),
+                    viagem -> JOptionPane.showMessageDialog(framePai, "Viagem para " + viagem.getLugarChegada() + " excluída!"),
+                    evt -> abrirPerfilCallback.run(),       // Botão voltar para o perfil
+                    evt -> abrirCadastroViagemCallback.run() // Botão para adicionar nova viagem
+            );
+
+            framePai.setContentPane(listaFrame.getPanel());
             framePai.revalidate();
             framePai.repaint();
         });
     }
+
 }

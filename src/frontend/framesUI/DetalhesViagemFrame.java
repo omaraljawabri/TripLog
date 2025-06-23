@@ -1,5 +1,7 @@
 package frontend.framesUI;
 
+import backend.main.entities.Viajante;
+
 import javax.swing.*;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
@@ -41,7 +43,7 @@ public class DetalhesViagemFrame {
     }
 
     /* ==================================================== */
-    public DetalhesViagemFrame() {
+    public DetalhesViagemFrame(Viajante viajante) {
         mainPanel = new JPanel(new BorderLayout(20, 20));
         mainPanel.setBackground(Color.WHITE);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(5, 30, 20, 30));

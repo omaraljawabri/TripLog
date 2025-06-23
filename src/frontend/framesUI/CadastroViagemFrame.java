@@ -1,5 +1,7 @@
 package frontend.framesUI;
 
+import backend.main.entities.Viajante;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -7,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CadastroViagemFrame {
-
     /* ----------------- Campos da janela ----------------- */
 
     private final JPanel mainPanel;
@@ -36,7 +37,7 @@ public class CadastroViagemFrame {
     }
 
     /* ==================================================== */
-    public CadastroViagemFrame() {
+    public CadastroViagemFrame(Viajante viajante) {
 
         /* ---------- Estrutura base ---------- */
         mainPanel = new JPanel();
