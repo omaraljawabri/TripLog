@@ -61,4 +61,31 @@ class ViajanteRepositoryTest {
 
         assertNull(viajanteRecuperado);
     }
+
+    @Test
+    void editarViajantePorEmail_RetornaTrue_QuandoViajanteEAtualizadoComSucesso(){
+        ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO);
+
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com");
+
+        viajanteRepository.salvarViajante(viajante);
+
+        boolean resultado = viajanteRepository.editarViajantePorEmail(viajante.getEmail(), "Ciclano", "ciclano123");
+
+        assertTrue(resultado);
+    }
+
+    @Test
+    void editarViajantePorEmail_RetornaFalse_QuandoOcorrerErroAoEditarViajante(){
+        ViajanteRepository viajanteRepository = new ViajanteRepository("erro/" + NOME_ARQUIVO);
+
+
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com");
+
+        viajanteRepository.salvarViajante(viajante);
+
+        boolean resultado = viajanteRepository.editarViajantePorEmail(viajante.getEmail(), "Ciclano", "ciclano123");
+
+        assertFalse(resultado);
+    }
 }

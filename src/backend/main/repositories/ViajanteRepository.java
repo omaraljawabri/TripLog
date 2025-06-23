@@ -1,6 +1,7 @@
 package backend.main.repositories;
 
 import backend.main.entities.Viajante;
+import backend.main.exceptions.ErroInternoException;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -20,15 +21,32 @@ public class ViajanteRepository {
     }
 
     public boolean salvarViajante(Viajante v){
-        Path path = Paths.get(caminhoArquivo);
         List<Viajante> viajantes = buscarTodosViajantes();
         viajantes.add(v);
+        return salvarViajantes(viajantes);
+    }
+
+    public boolean salvarViajantes(List<Viajante> viajantes){
+        Path path = Paths.get(caminhoArquivo);
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(Files.newOutputStream(path))) {
             objectOutputStream.writeObject(viajantes);
             return true;
         } catch (IOException e) {
             return false;
         }
+    }
+
+
+    public boolean editarViajantePorEmail(String email, String nome, String senha){
+        List<Viajante> viajantes = buscarTodosViajantes();
+        for (Viajante viajante : viajantes){
+            if (viajante.getEmail().equals(email)){
+                viajante.setNome(nome != null ? nome : viajante.getNome());
+                viajante.setSenha(senha != null ? senha : viajante.getSenha());
+                break;
+            }
+        }
+        return salvarViajantes(viajantes);
     }
 
     public Viajante buscarViajantePorEmail(String email){
@@ -52,7 +70,7 @@ public class ViajanteRepository {
             List<Viajante> viajantes = (List<Viajante>) objectInputStream.readObject();
             return viajantes;
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("Erro ao ler viajantes");
+            throw new ErroInternoException("Erro ao ler viajantes");
         }
     }
 }

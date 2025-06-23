@@ -1,6 +1,7 @@
 package backend.main.entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Viajante implements Serializable {
@@ -9,7 +10,7 @@ public class Viajante implements Serializable {
     private String nome;
     private String email;
     private String senha;
-    private List<Viagem> viagens;
+    private List<Viagem> viagens = new ArrayList<>();
 
     public Viajante() {
         Viajante.contador++;

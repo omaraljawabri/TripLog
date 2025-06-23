@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ViagemRepository {
 
@@ -54,21 +55,21 @@ public class ViagemRepository {
         }
     }
 
-    public List<Viagem> buscarViagensPorIdViajante(int idViajante){
+    public List<Viagem> buscarViagensPorEmailViajante(String email){
         Path path = Paths.get(caminhoArquivo);
         if (!Files.exists(path)){
             return new ArrayList<>();
         }
         try (ObjectInputStream objectInputStream = new ObjectInputStream(Files.newInputStream(path))) {
             List<Viagem> viagens = (List<Viagem>) objectInputStream.readObject();
-            return viagens.stream().filter(v -> v.getIdViajante() == idViajante).toList();
+            return viagens.stream().filter(v -> v.getEmailViajante().equals(email)).toList();
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException("Erro ao ler viagens");
         }
     }
 
-    public Viagem buscarViagemPorId(int id, int idViajante){
-        List<Viagem> viagens = buscarViagensPorIdViajante(idViajante);
+    public Viagem buscarViagemPorId(int id, String emailViajante){
+        List<Viagem> viagens = buscarViagensPorEmailViajante(emailViajante);
         List<Viagem> viagem = viagens.stream().filter(v -> v.getId() == id).toList();
         if (viagem.isEmpty()){
             return null;
@@ -76,9 +77,19 @@ public class ViagemRepository {
         return viagem.getFirst();
     }
 
-    public boolean removerViagemPorId(int id, int idViajante){
+    public List<Viagem> buscarViagensFiltradas(String emailViajante, String destino, String companhia, Double gasto){
+        List<Viagem> viagens = buscarViagensPorEmailViajante(emailViajante);
+
+        return viagens.stream()
+                .filter(v -> destino == null || v.getLugarDeChegada().equalsIgnoreCase(destino))
+                .filter(v -> companhia == null || v.getCompanhia().equalsIgnoreCase(companhia))
+                .filter(v -> gasto == null || v.calcularTotalGastos() > gasto)
+                .collect(Collectors.toList());
+    }
+
+    public boolean removerViagemPorId(int id, String emailViajante){
         List<Viagem> viagens = buscarTodasViagens();
-        boolean isRemovido = viagens.removeIf(v -> v.getId() == id && v.getIdViajante() == idViajante);
+        boolean isRemovido = viagens.removeIf(v -> v.getId() == id && v.getEmailViajante().equals(emailViajante));
         if (isRemovido){
             return salvarViagens(viagens);
         } else{
@@ -86,10 +97,10 @@ public class ViagemRepository {
         }
     }
 
-    public boolean editarViagemPorId(int id, int idViajante, Viagem viagemAtualizada){
+    public boolean editarViagemPorId(int id, String emailViajante, Viagem viagemAtualizada){
         List<Viagem> viagens = buscarTodasViagens();
         for (int i = 0; i < viagens.size(); i++) {
-            if (viagens.get(i).getId() == id && viagens.get(i).getIdViajante() == idViajante){
+            if (viagens.get(i).getId() == id && viagens.get(i).getEmailViajante().equals(emailViajante)){
                 viagemAtualizada.setId(id);
                 viagens.set(i, viagemAtualizada);
                 return salvarViagens(viagens);
