@@ -24,8 +24,4 @@ public abstract class Atividade implements Serializable {
     public double getGasto() {
         return gasto;
     }
-
-    public LocalDateTime getData() {
-        return data;
-    }
 }

@@ -29,10 +29,6 @@ public class Viajante implements Serializable {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getNome() {
         return nome;
     }
@@ -57,7 +53,4 @@ public class Viajante implements Serializable {
         this.viagens = viagens;
     }
 
-    public int getId() {
-        return id;
-    }
 }

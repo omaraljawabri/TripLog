@@ -23,42 +23,4 @@ public class Restaurante extends Atividade implements Serializable {
         Restaurante.contador++;
         this.id = Restaurante.contador;
     }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getNomeRestaurante() {
-        return nomeRestaurante;
-    }
-
-    public void setNomeRestaurante(String nomeRestaurante) {
-        this.nomeRestaurante = nomeRestaurante;
-    }
-
-    public String getCulinaria() {
-        return culinaria;
-    }
-
-    public void setCulinaria(String culinaria) {
-        this.culinaria = culinaria;
-    }
-
-    public String getPrato() {
-        return prato;
-    }
-
-    public void setPrato(String prato) {
-        this.prato = prato;
-    }
-
-    @Override
-    public String toString() {
-        return "Restaurante{" +
-                "id=" + id +
-                ", nomeRestaurante='" + nomeRestaurante + '\'' +
-                ", culinaria='" + culinaria + '\'' +
-                ", prato='" + prato + '\'' +
-                '}';
-    }
 }
