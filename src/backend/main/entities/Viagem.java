@@ -2,6 +2,7 @@ package backend.main.entities;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +16,6 @@ public class Viagem implements Serializable {
     private List<Deslocamento> deslocamentos = new ArrayList<>();
     private List<Hospedagem> hospedagens = new ArrayList<>();
     private double saldo;
-    private int diasPercorridos;
     private String companhia;
     private List<Atividade> atividades = new ArrayList<>();
     private String emailViajante;
@@ -25,7 +25,7 @@ public class Viagem implements Serializable {
         this.id = Viagem.contador;
     }
 
-    public Viagem(String lugarDePartida, String lugarDeChegada, List<Deslocamento> deslocamentos, List<Hospedagem> hospedagens, double saldo, int diasPercorridos, String companhia, List<Atividade> atividades, String emailViajante, LocalDate dataChegada, LocalDate dataTermino) {
+    public Viagem(String lugarDePartida, String lugarDeChegada, List<Deslocamento> deslocamentos, List<Hospedagem> hospedagens, double saldo, String companhia, List<Atividade> atividades, String emailViajante, LocalDate dataChegada, LocalDate dataTermino) {
         Viagem.contador++;
         this.id = Viagem.contador;
         this.lugarDePartida = lugarDePartida;
@@ -33,7 +33,6 @@ public class Viagem implements Serializable {
         this.deslocamentos = deslocamentos;
         this.hospedagens = hospedagens;
         this.saldo = saldo;
-        this.diasPercorridos = diasPercorridos;
         this.companhia = companhia;
         this.atividades = atividades;
         this.emailViajante = emailViajante;
@@ -97,14 +96,6 @@ public class Viagem implements Serializable {
         this.saldo = saldo;
     }
 
-    public int getDiasPercorridos() {
-        return diasPercorridos;
-    }
-
-    public void setDiasPercorridos(int diasPercorridos) {
-        this.diasPercorridos = diasPercorridos;
-    }
-
     public String getCompanhia() {
         return companhia;
     }
@@ -154,6 +145,13 @@ public class Viagem implements Serializable {
         return gastos;
     }
 
+    public int calcularDiasDeViagem() {
+        if (this.dataChegada != null && this.dataTermino != null) {
+            return (int) ChronoUnit.DAYS.between(this.dataChegada, this.dataTermino);
+        }
+        return 0;
+    }
+
     @Override
     public String toString() {
         return "Viagem{" +
@@ -163,7 +161,6 @@ public class Viagem implements Serializable {
                 ", deslocamentos=" + deslocamentos +
                 ", hospedagens=" + hospedagens +
                 ", saldo=" + saldo +
-                ", diasPercorridos=" + diasPercorridos +
                 ", companhia='" + companhia + '\'' +
                 ", atividades=" + atividades +
                 '}';

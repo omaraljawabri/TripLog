@@ -8,7 +8,6 @@ import backend.main.exceptions.SemResultadoException;
 import backend.main.exceptions.ValidacaoException;
 import backend.main.repositories.ViagemRepository;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,12 +53,16 @@ public class ViagemService {
         return viagem;
     }
 
-    public List<Viagem> buscarViagensFiltradas(String emailViajante, String destino, String companhia, double gasto){
+    public List<Viagem> buscarViagensFiltradas(String emailViajante, String destino, String companhia, Double gasto){
         List<Viagem> viagens = viagemRepository.buscarViagensFiltradas(emailViajante, destino, companhia, gasto);
         if (viagens.isEmpty()){
             throw new SemResultadoException("Não há resultados para o filtro aplicado");
         }
         return viagens;
+    }
+
+    public List<Viagem> buscarTodasViagensPorEmailViajante(String emailViajante){
+        return buscarTodasViagensPorEmailViajante(emailViajante);
     }
 
     public void removerViagem(int id, Viajante viajante){

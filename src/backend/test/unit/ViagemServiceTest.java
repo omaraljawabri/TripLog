@@ -3,6 +3,7 @@ package backend.test.unit;
 import backend.main.entities.*;
 import backend.main.exceptions.EntidadeNaoEncontradaException;
 import backend.main.exceptions.ErroInternoException;
+import backend.main.exceptions.SemResultadoException;
 import backend.main.exceptions.ValidacaoException;
 import backend.main.repositories.ViagemRepository;
 import backend.main.services.ViagemService;
@@ -108,10 +109,10 @@ class ViagemServiceTest {
         viagemService.adicionarViagem(viagem, viajante);
         viagemService.adicionarViagem(viagem2, viajante);
 
-        Viagem viagemBuscada = viagemService.buscarViagemPorId(1, viajante);
+        Viagem viagemBuscada = viagemService.buscarViagemPorId(viagem.getId(), viajante);
 
         assertNotNull(viagemBuscada);
-        assertEquals(1, viagemBuscada.getId());
+        assertEquals(viagem.getId(), viagemBuscada.getId());
     }
 
     @Test
@@ -190,11 +191,154 @@ class ViagemServiceTest {
     }
 
     @Test
-    void buscarViagensFiltradas_RetornaListaDeViagens_QuandoHouveremViagensComFiltrosAplicados(){
+    void buscarViagensFiltradas_RetornaListaDeViagemPopulada_QuandoHouveremViagensComDestinoAplicado(){
+        Viagem viagem = criarViagem1();
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
         ViagemService viagemService = new ViagemService(viagemRepository);
 
+        viagemRepository.salvarViagem(viagem);
 
+        List<Viagem> viagens
+                = viagemService.buscarViagensFiltradas("fulano@example.com", "Salvador", null, null);
+
+        assertNotNull(viagens);
+        assertFalse(viagens.isEmpty());
+        assertEquals("Salvador", viagens.getFirst().getLugarDeChegada());
+    }
+
+    @Test
+    void buscarViagensFiltradas_RetornaListaDeViagemPopulada_QuandoHouveremViagensComCompanhiaAplicada(){
+        Viagem viagem = criarViagem1();
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViagemService viagemService = new ViagemService(viagemRepository);
+
+        viagemRepository.salvarViagem(viagem);
+
+        List<Viagem> viagens
+                = viagemService.buscarViagensFiltradas("fulano@example.com", null, "João", null);
+
+        assertNotNull(viagens);
+        assertFalse(viagens.isEmpty());
+        assertEquals("João", viagens.getFirst().getCompanhia());
+    }
+
+    @Test
+    void buscarViagensFiltradas_RetornaListaDeViagemPopulada_QuandoHouverViagensComGastoSuperiorAoAplicado(){
+        Viagem viagem = criarViagem1();
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViagemService viagemService = new ViagemService(viagemRepository);
+
+        viagemRepository.salvarViagem(viagem);
+
+        double gasto = 500;
+
+        List<Viagem> viagens
+                = viagemService.buscarViagensFiltradas("fulano@example.com", null, null, gasto);
+
+        assertNotNull(viagens);
+        assertFalse(viagens.isEmpty());
+        assertTrue(viagens.getFirst().calcularTotalGastos() > gasto);
+    }
+
+    @Test
+    void buscarViagensFiltradas_LancaSemResultadoException_QuandoNaoHouveremViagensComDestinoAplicado(){
+        Viagem viagem = criarViagem1();
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViagemService viagemService = new ViagemService(viagemRepository);
+
+        viagemRepository.salvarViagem(viagem);
+
+        SemResultadoException exception = assertThrows(SemResultadoException.class, () -> viagemService.buscarViagensFiltradas("fulano@example.com", "Goiânia", null, null));
+
+        assertEquals("Não há resultados para o filtro aplicado", exception.getMessage());
+    }
+
+    @Test
+    void buscarViagensFiltradas_RetornaListaDeViagemVazia_QuandoNaoHouveremViagensComCompanhiaAplicada(){
+        Viagem viagem = criarViagem1();
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViagemService viagemService = new ViagemService(viagemRepository);
+
+        viagemRepository.salvarViagem(viagem);
+
+        SemResultadoException exception = assertThrows(SemResultadoException.class, () -> viagemService.buscarViagensFiltradas("fulano@example.com", null, "Felipe", null));
+
+        assertEquals("Não há resultados para o filtro aplicado", exception.getMessage());
+    }
+
+    @Test
+    void buscarViagensFiltradas_RetornaListaDeViagemVazia_QuandoNaoHouverViagensComGastoSuperiorAoAplicado(){
+        Viagem viagem = criarViagem1();
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViagemService viagemService = new ViagemService(viagemRepository);
+
+        viagemRepository.salvarViagem(viagem);
+
+        double gasto = 50000;
+
+        SemResultadoException exception = assertThrows(SemResultadoException.class, () -> viagemService.buscarViagensFiltradas("fulano@example.com", null, null, gasto));
+
+        assertEquals("Não há resultados para o filtro aplicado", exception.getMessage());
+    }
+
+    @Test
+    void buscarViagensFiltradas_RetornaListaDeViagemPopulada_QuandoHouverViagensComDestinoECompanhiaAplicados(){
+        Viagem viagem = criarViagem1();
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViagemService viagemService = new ViagemService(viagemRepository);
+
+        viagemRepository.salvarViagem(viagem);
+
+        List<Viagem> viagens
+                = viagemService.buscarViagensFiltradas("fulano@example.com", "Salvador", "João", null);
+
+        assertNotNull(viagens);
+        assertFalse(viagens.isEmpty());
+        assertEquals("João", viagens.getFirst().getCompanhia());
+        assertEquals("Salvador", viagens.getFirst().getLugarDeChegada());
+    }
+
+    @Test
+    void buscarViagensFiltradas_RetornaListaDeViagemPopulada_QuandoHouverViagensComDestinoCompanhiaEGastoAplicados(){
+        Viagem viagem = criarViagem1();
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViagemService viagemService = new ViagemService(viagemRepository);
+
+        viagemRepository.salvarViagem(viagem);
+
+        double gasto = 500;
+
+        List<Viagem> viagens
+                = viagemService.buscarViagensFiltradas("fulano@example.com", "Salvador", "João", gasto);
+
+        assertNotNull(viagens);
+        assertFalse(viagens.isEmpty());
+        assertEquals("João", viagens.getFirst().getCompanhia());
+        assertEquals("Salvador", viagens.getFirst().getLugarDeChegada());
+        assertTrue(viagens.getFirst().calcularTotalGastos() > gasto);
+    }
+
+    void buscarTodasViagensPorEmailViajante_RetornaListaDeViagem_QuandoHouverViagensComEmailViajantePassado(){
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViagemService viagemService = new ViagemService(viagemRepository);
+
+        viagemRepository.salvarViagem(criarViagem1());
+        viagemRepository.salvarViagem(criarViagem2());
+        Viagem viagem = criarViagem3();
+        viagem.setEmailViajante("teste");
+        viagemRepository.salvarViagem(viagem);
+
+        List<Viagem> viagens = viagemService.buscarTodasViagensPorEmailViajante("fulano@example.com");
+        assertFalse(viagens.isEmpty());
+        assertEquals(2, viagens.size());
+    }
+
+    void buscarTodasViagensPorEmailViajante_RetornaListaVazia_QuandoNaoHouverViagensComEmailViajantePassado(){
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViagemService viagemService = new ViagemService(viagemRepository);
+
+        List<Viagem> viagens = viagemService.buscarTodasViagensPorEmailViajante("fulano@example.com");
+        assertTrue(viagens.isEmpty());
     }
 
     private Viagem criarViagem1(){
@@ -228,7 +372,6 @@ class ViagemServiceTest {
 
         viagem1.setAtividades(atividades1);
         viagem1.setSaldo(1000.0);
-        viagem1.setDiasPercorridos(4);
         viagem1.setEmailViajante("fulano@example.com");
         return viagem1;
     }
@@ -264,7 +407,6 @@ class ViagemServiceTest {
 
         viagem2.setAtividades(atividades2);
         viagem2.setSaldo(800.0);
-        viagem2.setDiasPercorridos(3);
         viagem2.setEmailViajante("fulano@example.com");
         return viagem2;
     }
@@ -299,7 +441,6 @@ class ViagemServiceTest {
 
         viagem3.setAtividades(atividades3);
         viagem3.setSaldo(1500.0);
-        viagem3.setDiasPercorridos(5);
         viagem3.setEmailViajante("fulano@example.com");
         return viagem3;
     }

@@ -3,6 +3,7 @@ package backend.test.unit;
 import backend.main.entities.*;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,11 +26,29 @@ class ViagemTest {
         assertEquals(0, viagem.calcularTotalGastos());
     }
 
+    @Test
+    void calcularDiasDeViagem_RetornaInt_QuandoDiaDeChegadaETerminoDaViagemNaoSaoNull(){
+        Viagem viagem = criarViagem1();
+        int diasDeViagem = viagem.calcularDiasDeViagem();
+
+        assertEquals(7, diasDeViagem);
+    }
+
+    @Test
+    void calcularDiasDeViagem_RetornaZero_QuandoDiaDeChegadaOuTerminoForNull(){
+        Viagem viagem = new Viagem();
+
+        int diasDeViagem = viagem.calcularDiasDeViagem();
+        assertEquals(0, diasDeViagem);
+    }
+
     private Viagem criarViagem1(){
         Viagem viagem1 = new Viagem();
         viagem1.setLugarDePartida("Rio de Janeiro");
         viagem1.setLugarDeChegada("Salvador");
         viagem1.setCompanhia("João");
+        viagem1.setDataChegada(LocalDate.of(2025, 6, 10));
+        viagem1.setDataTermino(LocalDate.of(2025, 6, 17));
 
         viagem1.setDeslocamentos(List.of(
                 new Deslocamento("Avião", 800.0),
@@ -56,7 +75,6 @@ class ViagemTest {
 
         viagem1.setAtividades(atividades1);
         viagem1.setSaldo(1000.0);
-        viagem1.setDiasPercorridos(4);
         viagem1.setEmailViajante("fulano@example.com");
         return viagem1;
     }

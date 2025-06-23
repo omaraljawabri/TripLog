@@ -10,8 +10,8 @@ public class Restaurante extends Atividade implements Serializable {
     private String culinaria;
     private String prato;
 
-    public Restaurante(String nome, double gasto, LocalDateTime horario, String nomeRestaurante, String culinaria, String prato) {
-        super(nome, gasto, horario);
+    public Restaurante(String nome, double gasto, LocalDateTime data, String nomeRestaurante, String culinaria, String prato) {
+        super(nome, gasto, data);
         Restaurante.contador++;
         this.id = Restaurante.contador;
         this.nomeRestaurante = nomeRestaurante;
