@@ -1,8 +1,9 @@
 package backend.test.unit;
 
 import backend.main.entities.*;
-import backend.main.exceptions.EntityNotFoundException;
-import backend.main.exceptions.ValidationException;
+import backend.main.exceptions.EntidadeNaoEncontradaException;
+import backend.main.exceptions.ErroInternoException;
+import backend.main.exceptions.ValidacaoException;
 import backend.main.repositories.ViagemRepository;
 import backend.main.services.ViagemService;
 import org.junit.jupiter.api.AfterEach;
@@ -51,19 +52,20 @@ class ViagemServiceTest {
         Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com");
         viagem.setLugarDeChegada(null);
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> viagemService.adicionarViagem(viagem, viajante));
+        ValidacaoException exception = assertThrows(ValidacaoException.class, () -> viagemService.adicionarViagem(viagem, viajante));
 
         assertEquals("Atributos lugar de partida, lugar de chegada, deslocamentos, hospedagens e atividades devem ser preenchidos", exception.getMessage());
     }
 
     @Test
-    void adicionarViagem_LancaRuntimeException_QuandoAlgumErroOcorreAoAdicionarViagem(){
-        ViagemRepository viagemRepository = new ViagemRepository(null);
+    void adicionarViagem_LancaErroInternoException_QuandoAlgumErroOcorreAoAdicionarViagem(){
+        ViagemRepository viagemRepository = new ViagemRepository("erro/"+NOME_ARQUIVO_VIAGEM);
         ViagemService viagemService = new ViagemService(viagemRepository);
         Viagem viagem = criarViagem1();
         Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com");
 
-        assertThrows(RuntimeException.class, () -> viagemService.adicionarViagem(viagem, viajante));
+        ErroInternoException exception = assertThrows(ErroInternoException.class, () -> viagemService.adicionarViagem(viagem, viajante));
+        assertEquals("Erro ao adicionar nova viagem", exception.getMessage());
     }
 
     @Test
@@ -118,7 +120,7 @@ class ViagemServiceTest {
         ViagemService viagemService = new ViagemService(viagemRepository);
         Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com");
 
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> viagemService.buscarViagemPorId(2, viajante));
+        EntidadeNaoEncontradaException exception = assertThrows(EntidadeNaoEncontradaException.class, () -> viagemService.buscarViagemPorId(2, viajante));
 
         assertEquals("Viagem com id: 2, não encontrada!", exception.getMessage());
     }
@@ -149,7 +151,7 @@ class ViagemServiceTest {
 
         Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com");
 
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> viagemService.removerViagem(2, viajante));
+        EntidadeNaoEncontradaException exception = assertThrows(EntidadeNaoEncontradaException.class, () -> viagemService.removerViagem(2, viajante));
 
         assertEquals("Viagem com id: 2, não encontrada!", exception.getMessage());
     }
@@ -163,8 +165,8 @@ class ViagemServiceTest {
         Viagem viagem2 = criarViagem2();
         Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com");
 
-        viagem.setIdViajante(viajante.getId());
-        viagem2.setIdViajante(viajante.getId());
+        viagem.setEmailViajante(viajante.getEmail());
+        viagem2.setEmailViajante(viajante.getEmail());
         viagemService.adicionarViagem(viagem, viajante);
 
         assertDoesNotThrow(() -> viagemService.editarViagem(viagem.getId(), viagem2, viajante));
@@ -182,9 +184,17 @@ class ViagemServiceTest {
 
         Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com");
 
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> viagemService.editarViagem(2, criarViagem1(), viajante));
+        EntidadeNaoEncontradaException exception = assertThrows(EntidadeNaoEncontradaException.class, () -> viagemService.editarViagem(2, criarViagem1(), viajante));
 
         assertEquals("Viagem com id: 2, não encontrada!", exception.getMessage());
+    }
+
+    @Test
+    void buscarViagensFiltradas_RetornaListaDeViagens_QuandoHouveremViagensComFiltrosAplicados(){
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViagemService viagemService = new ViagemService(viagemRepository);
+
+
     }
 
     private Viagem criarViagem1(){
@@ -219,7 +229,7 @@ class ViagemServiceTest {
         viagem1.setAtividades(atividades1);
         viagem1.setSaldo(1000.0);
         viagem1.setDiasPercorridos(4);
-        viagem1.setIdViajante(1);
+        viagem1.setEmailViajante("fulano@example.com");
         return viagem1;
     }
 
@@ -255,7 +265,7 @@ class ViagemServiceTest {
         viagem2.setAtividades(atividades2);
         viagem2.setSaldo(800.0);
         viagem2.setDiasPercorridos(3);
-        viagem2.setIdViajante(1);
+        viagem2.setEmailViajante("fulano@example.com");
         return viagem2;
     }
 
@@ -290,7 +300,7 @@ class ViagemServiceTest {
         viagem3.setAtividades(atividades3);
         viagem3.setSaldo(1500.0);
         viagem3.setDiasPercorridos(5);
-        viagem3.setIdViajante(1);
+        viagem3.setEmailViajante("fulano@example.com");
         return viagem3;
     }
 }

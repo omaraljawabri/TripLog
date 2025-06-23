@@ -1,7 +1,8 @@
 package backend.test.unit;
 
 import backend.main.entities.Viajante;
-import backend.main.exceptions.ValidationException;
+import backend.main.exceptions.ErroInternoException;
+import backend.main.exceptions.ValidacaoException;
 import backend.main.repositories.ViajanteRepository;
 import backend.main.services.AuthService;
 import org.junit.jupiter.api.AfterEach;
@@ -39,19 +40,33 @@ class AuthServiceTest {
 
         Viajante viajante = new Viajante(null, "fulano123", "fulano@example.com");
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> authService.cadastrar(viajante));
+        ValidacaoException exception = assertThrows(ValidacaoException.class, () -> authService.cadastrar(viajante));
         assertEquals("Email, nome e senha devem ser preenchidos", exception.getMessage());
     }
 
     @Test
-    void cadastrar_RetornaFalse_QuandoAlgumErroOcorreAoSalvarViajante(){
+    void cadastrar_LancaErroInternoException_QuandoAlgumErroOcorreAoSalvarViajante(){
         ViajanteRepository viajanteRepository = new ViajanteRepository("/erro/"+NOME_ARQUIVO_VIAJANTE);
         AuthService authService = new AuthService(viajanteRepository);
 
         Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com");
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> authService.cadastrar(viajante));
+        ErroInternoException exception = assertThrows(ErroInternoException.class, () -> authService.cadastrar(viajante));
         assertEquals("Erro ao fazer cadastro", exception.getMessage());
+    }
+
+    @Test
+    void cadastrar_LancaValidationException_QuandoOEmailInformadoParaCadastroJaExistirNoSistema(){
+        ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
+        AuthService authService = new AuthService(viajanteRepository);
+
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com");
+
+        authService.cadastrar(viajante);
+
+        Viajante viajante2 = new Viajante("Fulano", "fulano123", "fulano@example.com");
+        ValidacaoException validacaoException = assertThrows(ValidacaoException.class, () -> authService.cadastrar(viajante2));
+        assertEquals("Email informado já está em uso", validacaoException.getMessage());
     }
 
     @Test
@@ -75,7 +90,7 @@ class AuthServiceTest {
 
         Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com");
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> authService.login(viajante.getSenha(), viajante.getEmail()));
+        ValidacaoException exception = assertThrows(ValidacaoException.class, () -> authService.login(viajante.getSenha(), viajante.getEmail()));
         assertEquals("Viajante com email ou senha incorreto(s)!", exception.getMessage());
     }
 
@@ -90,7 +105,7 @@ class AuthServiceTest {
 
         viajante.setSenha("senhaincorreta123");
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> authService.login(viajante.getSenha(), viajante.getEmail()));
+        ValidacaoException exception = assertThrows(ValidacaoException.class, () -> authService.login(viajante.getSenha(), viajante.getEmail()));
         assertEquals("Viajante com email ou senha incorreto(s)!", exception.getMessage());
     }
 }
