@@ -62,7 +62,8 @@ public class MainFrame extends JFrame {
 
         home = new HomeFrame(viajante);
         home.setCadastrarViagemButtonListener(e -> abrirCadastroViagem());
-        home.setMinhasViagensButtonListener(e -> abrirPerfil(usuarioLogado));
+        home.setMinhasViagensButtonListener(e -> abrirListaDeViagens());
+        home.setMeuPerfilButtonListener(e -> abrirPerfil(usuarioLogado));
         cardPanel.add(home.getPanel(), "home");
 
         cardLayout.show(cardPanel, "home");

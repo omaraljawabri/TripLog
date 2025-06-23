@@ -14,6 +14,7 @@ public class HomeFrame {
     private final JPanel mainPanel;
     private final JButton cadastrarViagemButton;
     private final JButton minhasViagensButton;
+    private final JButton meuPerfilButton;
 
     /* Elementos que precisam ser redimensionados dinamicamente */
     private final JLabel imgLabel;
@@ -100,12 +101,15 @@ public class HomeFrame {
 
         cadastrarViagemButton = new JButton("Cadastrar nova viagem");
         minhasViagensButton   = new JButton("Minhas viagens");
+        meuPerfilButton   = new JButton("Meu perfil");
 
         stylePrimaryButton(cadastrarViagemButton);
         styleSecondaryButton(minhasViagensButton);
+        styleSecondaryButton(meuPerfilButton);
 
         footerPanel.add(cadastrarViagemButton);
         footerPanel.add(minhasViagensButton);
+        footerPanel.add(meuPerfilButton);
 
         /* ---------- Junta tudo ---------- */
         mainPanel.add(scrollPane, BorderLayout.CENTER);
@@ -129,6 +133,10 @@ public class HomeFrame {
         minhasViagensButton.addActionListener(listener);
     }
 
+    public void setMeuPerfilButtonListener(java.awt.event.ActionListener listener) {
+        meuPerfilButton.addActionListener(listener);
+    }
+
     /* ---------- Responsividade: ajusta imagem, fontes, margens ---------- */
     private void ajustarLayout(int larguraPainel) {
 
@@ -149,6 +157,7 @@ public class HomeFrame {
         int btnWidth = larguraPainel < 500 ? larguraPainel - 120 : 240;
         cadastrarViagemButton.setPreferredSize(new Dimension(btnWidth, 48));
         minhasViagensButton  .setPreferredSize(new Dimension(btnWidth < 200 ? 200 : 180, 48));
+        meuPerfilButton  .setPreferredSize(new Dimension(btnWidth < 200 ? 200 : 180, 48));
 
         mainPanel.revalidate();
     }
@@ -190,4 +199,5 @@ public class HomeFrame {
     public JPanel   getPanel()                { return mainPanel; }
     public JButton  getCadastrarViagemButton(){ return cadastrarViagemButton; }
     public JButton  getMinhasViagensButton()  { return minhasViagensButton;  }
+    public JButton getMeuPerfilButton() {return meuPerfilButton; }
 }
