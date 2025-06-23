@@ -37,7 +37,7 @@ public class CadastroFrame {
         title.setFont(new Font("SansSerif", Font.BOLD, 24));
         title.setForeground(new Color(33, 70, 120));
 
-        JLabel subtitle = new JLabel("Junte-se à plataforma TravelPOO!");
+        JLabel subtitle = new JLabel("Junte-se à plataforma TripLog!");
         subtitle.setFont(new Font("SansSerif", Font.PLAIN, 14));
         subtitle.setForeground(new Color(80, 80, 80));
 

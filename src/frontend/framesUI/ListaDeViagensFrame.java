@@ -24,7 +24,6 @@ public class ListaDeViagensFrame {
 
     // Novos botões
     private final JButton btnAdicionarViagem = new JButton("Adicionar Viagem");
-    private final JButton btnAtualizarLista = new JButton("Atualizar Lista");
 
     public ListaDeViagensFrame(List<Viagem> viagens,
                                Consumer<Viagem> verDetalhesListener,
@@ -82,12 +81,6 @@ public class ListaDeViagensFrame {
         btnAdicionarViagem.setPreferredSize(new Dimension(150, 36));
         btnAdicionarViagem.addActionListener(adicionarListener);
         footerPanel.add(btnAdicionarViagem);
-
-        // Botão Atualizar Lista
-        styleSecondaryButton(btnAtualizarLista);
-        btnAtualizarLista.setPreferredSize(new Dimension(140, 36));
-        btnAtualizarLista.addActionListener(e -> atualizarLista());
-        footerPanel.add(btnAtualizarLista);
 
         // Botão Voltar para o perfil
         JButton btnVoltar = new JButton("Voltar para o perfil");
