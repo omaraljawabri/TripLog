@@ -2,7 +2,6 @@ package backend.main.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class Evento extends Atividade implements Serializable {
     private int id;
@@ -14,8 +13,8 @@ public class Evento extends Atividade implements Serializable {
         this.id = Evento.contador;
     }
 
-    public Evento(String nome, List<Gasto> gastos, LocalDateTime horario, String tema) {
-        super(nome, gastos, horario);
+    public Evento(String nome, double gasto, LocalDateTime horario, String tema) {
+        super(nome, gasto, horario);
         Evento.contador++;
         this.id = Evento.contador;
         this.tema = tema;

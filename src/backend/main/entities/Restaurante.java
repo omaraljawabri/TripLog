@@ -2,7 +2,6 @@ package backend.main.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public class Restaurante extends Atividade implements Serializable {
     private static int contador;
@@ -11,8 +10,8 @@ public class Restaurante extends Atividade implements Serializable {
     private String culinaria;
     private String prato;
 
-    public Restaurante(String nome, List<Gasto> gastos, LocalDateTime horario, String nomeRestaurante, String culinaria, String prato) {
-        super(nome, gastos, horario);
+    public Restaurante(String nome, double gasto, LocalDateTime horario, String nomeRestaurante, String culinaria, String prato) {
+        super(nome, gasto, horario);
         Restaurante.contador++;
         this.id = Restaurante.contador;
         this.nomeRestaurante = nomeRestaurante;

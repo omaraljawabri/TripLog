@@ -2,19 +2,18 @@ package backend.main.entities;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 
 public abstract class Atividade implements Serializable {
     private String nome;
-    private List<Gasto> gastos;
+    private double gasto;
     private LocalDateTime data;
 
     public Atividade() {
     }
 
-    public Atividade(String nome, List<Gasto> gastos, LocalDateTime data) {
+    public Atividade(String nome, double gasto, LocalDateTime data) {
         this.nome = nome;
-        this.gastos = gastos;
+        this.gasto = gasto;
         this.data = data;
     }
 
@@ -22,8 +21,8 @@ public abstract class Atividade implements Serializable {
         return nome;
     }
 
-    public List<Gasto> getGastos() {
-        return gastos;
+    public double getGasto() {
+        return gasto;
     }
 
     public LocalDateTime getData() {
