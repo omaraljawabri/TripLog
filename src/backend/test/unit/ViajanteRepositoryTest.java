@@ -111,7 +111,7 @@ class ViajanteRepositoryTest {
         viajanteRepository.salvarViajante(viajante3);
 
         int maiorId = viajanteRepository.buscarMaiorId();
-        assertEquals(3, maiorId);
+        assertEquals(viajante3.getId(), maiorId);
     }
 
     @Test
