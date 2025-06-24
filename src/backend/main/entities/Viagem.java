@@ -109,6 +109,15 @@ public class Viagem implements Serializable {
     }
 
     /**
+     * Define o id da viagem.
+     * Utilizado apenas em testes unitários
+     * @param id Id da viagem
+     * */
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    /**
      * Busca e retorna o lugar de partida da viagem
      * @return Lugar de partida da viagem
      * */
