@@ -23,4 +23,16 @@ public class Restaurante extends Atividade implements Serializable {
         Restaurante.contador++;
         this.id = Restaurante.contador;
     }
+
+    public String getNomeRestaurante() {
+        return nomeRestaurante;
+    }
+
+    public String getCulinaria() {
+        return culinaria;
+    }
+
+    public String getPrato() {
+        return prato;
+    }
 }

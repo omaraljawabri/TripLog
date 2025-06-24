@@ -1,8 +1,14 @@
 package frontend.framesUI;
 
+import backend.main.entities.*;
+import backend.main.repositories.ViagemRepository;
+import backend.main.services.ViagemService;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -10,28 +16,33 @@ public class ListaDeViagensFrame {
 
     private final JTextField txtFiltroDestino = new JTextField(15);
     private final JTextField txtFiltroSaldoMin = new JTextField(6);
-    private final JTextField txtFiltroSaldoMax = new JTextField(6);
+    private final JTextField txtFiltroCompanhia = new JTextField(10);
     private final JButton btnFiltrar = new JButton("Filtrar");
 
     private final JPanel mainPanel = new JPanel(new BorderLayout());
     private final JPanel listaPanel = new JPanel();
     private final JScrollPane scroll;
 
+    private final Viajante viajante;
     private final List<Viagem> viagens;
     private final Consumer<Viagem> onVerDetalhes;
     private final Consumer<Viagem> onExcluir;
     private final ActionListener btnVoltarListener;
 
-    // Novos botões
-    private final JButton btnAdicionarViagem = new JButton("Adicionar Viagem");
+    private final ViagemRepository viagemRepository = new ViagemRepository("viagem.ser");
+    private final ViagemService viagemService = new ViagemService(viagemRepository);
 
-    public ListaDeViagensFrame(List<Viagem> viagens,
+    private final JButton btnAdicionarViagem = new JButton("Adicionar Viagem");
+    private final JButton btnAtualizarLista = new JButton("Atualizar Lista");
+
+    public ListaDeViagensFrame(Viajante viajante, List<Viagem> viagens,
                                Consumer<Viagem> verDetalhesListener,
                                Consumer<Viagem> excluirListener,
                                ActionListener voltarListener,
-                               ActionListener adicionarListener) {  // listener para botão adicionar
+                               ActionListener adicionarListener) {
 
         this.viagens = viagens;
+        this.viajante = viajante;  // Guarda o viajante
         this.onVerDetalhes = verDetalhesListener;
         this.onExcluir = excluirListener;
         this.btnVoltarListener = voltarListener;
@@ -72,17 +83,19 @@ public class ListaDeViagensFrame {
 
         mainPanel.add(wrapper, BorderLayout.CENTER);
 
-        // Painel inferior com botões Adicionar, Atualizar e Voltar
         JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
         footerPanel.setBackground(Color.WHITE);
 
-        // Botão Adicionar Viagem
         stylePrimaryButton(btnAdicionarViagem);
         btnAdicionarViagem.setPreferredSize(new Dimension(150, 36));
         btnAdicionarViagem.addActionListener(adicionarListener);
         footerPanel.add(btnAdicionarViagem);
 
-        // Botão Voltar para o perfil
+        styleSecondaryButton(btnAtualizarLista);
+        btnAtualizarLista.setPreferredSize(new Dimension(140, 36));
+        btnAtualizarLista.addActionListener(e -> atualizarLista());
+        footerPanel.add(btnAtualizarLista);
+
         JButton btnVoltar = new JButton("Voltar para o perfil");
         styleSecondaryButton(btnVoltar);
         btnVoltar.setPreferredSize(new Dimension(180, 36));
@@ -124,13 +137,16 @@ public class ListaDeViagensFrame {
         filtros.setBorder(BorderFactory.createEmptyBorder(0, 40, 10, 40));
 
         filtros.add(new JLabel("Destino:"));
-        styleField(txtFiltroDestino); filtros.add(txtFiltroDestino);
+        styleField(txtFiltroDestino);
+        filtros.add(txtFiltroDestino);
 
         filtros.add(new JLabel("Saldo mín.:"));
-        styleField(txtFiltroSaldoMin); filtros.add(txtFiltroSaldoMin);
+        styleField(txtFiltroSaldoMin);
+        filtros.add(txtFiltroSaldoMin);
 
-        filtros.add(new JLabel("Saldo máx.:"));
-        styleField(txtFiltroSaldoMax); filtros.add(txtFiltroSaldoMax);
+        filtros.add(new JLabel("Companhia:"));
+        styleField(txtFiltroCompanhia);
+        filtros.add(txtFiltroCompanhia);
 
         stylePrimaryButton(btnFiltrar);
         btnFiltrar.setPreferredSize(new Dimension(130, 38));
@@ -155,9 +171,9 @@ public class ListaDeViagensFrame {
 
         gbc.gridx = 1;
         gbc.insets = new Insets(6, -30, 6, 15);
-        JLabel diasHeader = colunaCabecalho("Dias");
-        diasHeader.setPreferredSize(new Dimension(100, 24));
-        cab.add(diasHeader, gbc);
+        JLabel companhiaHeader = colunaCabecalho("Companhia");
+        companhiaHeader.setPreferredSize(new Dimension(100, 24));
+        cab.add(companhiaHeader, gbc);
 
         gbc.gridx = 2;
         gbc.insets = new Insets(6, 100, 6, 15);
@@ -181,15 +197,15 @@ public class ListaDeViagensFrame {
 
         gbc.insets = new Insets(6, 15, 6, 15);
         gbc.gridx = 0;
-        JLabel destinoValor = colunaTexto(v.getLugarChegada());
+        JLabel destinoValor = colunaTexto(v.getLugarDeChegada());
         destinoValor.setPreferredSize(new Dimension(350, 24));
         linha.add(destinoValor, gbc);
 
         gbc.gridx = 1;
         gbc.insets = new Insets(6, 60, 6, 15);
-        JLabel diasValor = colunaTexto(String.valueOf(v.getDiasPercorridos()));
-        diasValor.setPreferredSize(new Dimension(100, 24));
-        linha.add(diasValor, gbc);
+        JLabel companhiaValor = colunaTexto(v.getCompanhia());
+        companhiaValor.setPreferredSize(new Dimension(100, 24));
+        linha.add(companhiaValor, gbc);
 
         gbc.gridx = 2;
         gbc.insets = new Insets(6, 100, 6, 15);
@@ -203,14 +219,45 @@ public class ListaDeViagensFrame {
         JButton btnDetalhes = new JButton("Ver detalhes");
         styleSecondaryButton(btnDetalhes);
         btnDetalhes.setPreferredSize(new Dimension(130, 32));
-        btnDetalhes.addActionListener(e -> onVerDetalhes.accept(v));
+
+        btnDetalhes.addActionListener(e -> {
+            DetalhesViagemFrame detalhesFrame = new DetalhesViagemFrame(viajante);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            String dataChegadaStr = v.getDataChegada() != null ? v.getDataChegada().format(formatter) : "";
+            String dataTerminoStr = v.getDataTermino() != null ? v.getDataTermino().format(formatter) : "";
+
+            detalhesFrame.carregarDadosViagem(
+                    v.getId(),
+                    v.getLugarDePartida(),
+                    v.getLugarDeChegada(),
+                    String.format("R$ %.2f", v.getSaldo()),
+                    String.format("R$ %.2f", v.calcularTotalGastos()),
+                    dataChegadaStr,
+                    dataTerminoStr,
+                    String.valueOf(v.calcularDiasDeViagem()),
+                    v.getCompanhia(),
+                    getHospedagensAsDados(v.getHospedagens()),
+                    getAtividadesAsDados(v.getAtividades()),
+                    getDeslocamentosAsDados(v.getDeslocamentos())
+            );
+
+            // Obtém o JFrame que contém o botão
+            JFrame mainFrame = (JFrame) SwingUtilities.getWindowAncestor((Component) e.getSource());
+            // Troca o conteúdo da janela para a tela de detalhes
+            mainFrame.setContentPane(detalhesFrame.getPanel());
+            mainFrame.revalidate();
+            mainFrame.repaint();
+        });
+
+
 
         JButton btnExcluir = new JButton("Excluir");
         styleRemoveButton(btnExcluir);
         btnExcluir.setPreferredSize(new Dimension(100, 32));
         btnExcluir.addActionListener(e -> {
             onExcluir.accept(v);
-            viagens.remove(v);
+            viagemService.removerViagem(v.getId(), viajante);
             atualizarLista();
         });
 
@@ -230,12 +277,15 @@ public class ListaDeViagensFrame {
 
         String destinoFiltro = txtFiltroDestino.getText().trim().toLowerCase();
         double min = parseDouble(txtFiltroSaldoMin.getText(), Double.NEGATIVE_INFINITY);
-        double max = parseDouble(txtFiltroSaldoMax.getText(), Double.POSITIVE_INFINITY);
+        String companhiaFiltro = txtFiltroCompanhia.getText().trim().toLowerCase();
 
-        viagens.stream()
-                .filter(v -> v.getLugarChegada().toLowerCase().contains(destinoFiltro))
-                .filter(v -> v.getSaldo() >= min && v.getSaldo() <= max)
-                .forEach(v -> listaPanel.add(criarLinhaViagem(v)));
+        List<Viagem> viagens = viagemService.buscarViagensFiltradas(viajante.getEmail(), destinoFiltro, companhiaFiltro, min);
+        this.viagens.clear();
+        this.viagens.addAll(viagens);
+
+        for (Viagem viagem : this.viagens){
+            listaPanel.add(criarLinhaViagem(viagem));
+        }
 
         if (listaPanel.getComponentCount() == 1) {
             JLabel vazio = new JLabel("Nenhuma viagem encontrada.");
@@ -283,60 +333,140 @@ public class ListaDeViagensFrame {
 
     private void stylePrimaryButton(JButton b) {
         Color bg = new Color(0, 123, 255), hover = new Color(0, 105, 217);
-        b.setBackground(bg); b.setForeground(Color.WHITE);
+        b.setBackground(bg);
+        b.setForeground(Color.WHITE);
         b.setFocusPainted(false);
         b.setFont(new Font("SansSerif", Font.BOLD, 14));
         b.setBorder(BorderFactory.createEmptyBorder(6, 18, 6, 18));
         b.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent e) { b.setBackground(hover); }
-            public void mouseExited (java.awt.event.MouseEvent e) { b.setBackground(bg); }
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                b.setBackground(hover);
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                b.setBackground(bg);
+            }
         });
     }
 
     private void styleSecondaryButton(JButton b) {
         Color border = new Color(0, 123, 255), hover = new Color(230, 240, 255);
-        b.setBackground(Color.WHITE); b.setForeground(border);
+        b.setBackground(Color.WHITE);
+        b.setForeground(border);
         b.setFocusPainted(false);
         b.setFont(new Font("SansSerif", Font.BOLD, 13));
         b.setBorder(BorderFactory.createLineBorder(border, 2));
         b.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent e) { b.setBackground(hover); }
-            public void mouseExited (java.awt.event.MouseEvent e) { b.setBackground(Color.WHITE); }
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                b.setBackground(hover);
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                b.setBackground(Color.WHITE);
+            }
         });
     }
 
     private void styleRemoveButton(JButton b) {
         Color bg = new Color(220, 53, 69), hover = new Color(180, 40, 55);
-        b.setBackground(bg); b.setForeground(Color.WHITE);
+        b.setBackground(bg);
+        b.setForeground(Color.WHITE);
         b.setFocusPainted(false);
         b.setFont(new Font("SansSerif", Font.BOLD, 13));
         b.setBorder(BorderFactory.createEmptyBorder(6, 18, 6, 18));
         b.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent e) { b.setBackground(hover); }
-            public void mouseExited (java.awt.event.MouseEvent e) { b.setBackground(bg); }
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                b.setBackground(hover);
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                b.setBackground(bg);
+            }
         });
     }
 
-    public JPanel getPanel() { return mainPanel; }
+    public JPanel getPanel() {
+        return mainPanel;
+    }
 
-    // Getters para botões externos (opcional)
     public JButton getBtnAdicionarViagem() {
         return btnAdicionarViagem;
     }
 
-    public static class Viagem {
-        private final String destino;
-        private final int dias;
-        private final double saldo;
+    public List<frontend.framesUI.DetalhesViagemFrame.HospedagemDados> getHospedagensAsDados(List<Hospedagem> hospedagens) {
+        List<frontend.framesUI.DetalhesViagemFrame.HospedagemDados> dados = new ArrayList<>();
+        for (Hospedagem h : hospedagens) {
+            dados.add(new frontend.framesUI.DetalhesViagemFrame.HospedagemDados(
+                    h.getNomeLocalHospedagem(),
+                    String.valueOf(h.getNumeroDeNoites()),
+                    String.format("R$ %.2f", h.getValorDiaria())
+            ));
+        }
+        return dados;
+    }
 
-        public Viagem(String destino, int dias, double saldo) {
-            this.destino = destino;
-            this.dias = dias;
-            this.saldo = saldo;
+    // Retorna lista de dados de atividades para a UI
+
+
+    public List<frontend.framesUI.DetalhesViagemFrame.AtividadeDados> getAtividadesAsDados(List<Atividade> atividades) {
+        List<frontend.framesUI.DetalhesViagemFrame.AtividadeDados> dados = new ArrayList<>();
+
+        // Formatadores para data e hora
+        DateTimeFormatter formatadorData = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter formatadorHora = DateTimeFormatter.ofPattern("HH:mm");
+
+        for (Atividade a : atividades) {
+            String tipo = a.getClass().getSimpleName();
+            String tema = "";
+            String local = "";
+            String restaurante = "";
+            String culinaria = "";
+            String prato = "";
+
+            if (a instanceof Restaurante) {
+                Restaurante r = (Restaurante) a;
+                restaurante = r.getNomeRestaurante();
+                culinaria = r.getCulinaria();
+                prato = r.getPrato();
+            }
+
+            // Extrair data e horário a partir do LocalDateTime
+            String data = "";
+            String horario = "";
+            if (a.getData() != null) {
+                data = a.getData().toLocalDate().format(formatadorData);
+                horario = a.getData().toLocalTime().format(formatadorHora);
+            }
+
+            String gasto = String.format("R$ %.2f", a.getGasto());
+
+            dados.add(new frontend.framesUI.DetalhesViagemFrame.AtividadeDados(
+                    tipo,
+                    a.getNome(),
+                    data,
+                    horario,
+                    tema,
+                    local,
+                    restaurante,
+                    culinaria,
+                    prato,
+                    gasto
+            ));
         }
 
-        public String getLugarChegada() { return destino; }
-        public int getDiasPercorridos() { return dias; }
-        public double getSaldo() { return saldo; }
+        return dados;
+    }
+
+
+
+    public List<frontend.framesUI.DetalhesViagemFrame.DeslocamentoDados> getDeslocamentosAsDados(List<Deslocamento> deslocamentos) {
+        List<frontend.framesUI.DetalhesViagemFrame.DeslocamentoDados> dados = new ArrayList<>();
+        for (Deslocamento d : deslocamentos) {
+            dados.add(new frontend.framesUI.DetalhesViagemFrame.DeslocamentoDados(
+                    d.getMeioDeTransporte(),
+                    String.format("R$ %.2f", d.getCusto())
+            ));
+        }
+        return dados;
     }
 }

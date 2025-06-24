@@ -25,4 +25,16 @@ public class Hospedagem implements Serializable {
     public double calculaTotal(){
         return this.numeroDeNoites*this.valorDiaria;
     }
+
+    public String getNomeLocalHospedagem() {
+        return nomeLocalHospedagem;
+    }
+
+    public int getNumeroDeNoites() {
+        return numeroDeNoites;
+    }
+
+    public double getValorDiaria() {
+        return valorDiaria;
+    }
 }

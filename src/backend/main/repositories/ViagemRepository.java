@@ -68,22 +68,13 @@ public class ViagemRepository {
         }
     }
 
-    public Viagem buscarViagemPorId(int id, String emailViajante){
-        List<Viagem> viagens = buscarViagensPorEmailViajante(emailViajante);
-        List<Viagem> viagem = viagens.stream().filter(v -> v.getId() == id).toList();
-        if (viagem.isEmpty()){
-            return null;
-        }
-        return viagem.getFirst();
-    }
-
     public List<Viagem> buscarViagensFiltradas(String emailViajante, String destino, String companhia, Double gasto){
         List<Viagem> viagens = buscarViagensPorEmailViajante(emailViajante);
 
         return viagens.stream()
-                .filter(v -> destino == null || v.getLugarDeChegada().equalsIgnoreCase(destino))
-                .filter(v -> companhia == null || v.getCompanhia().equalsIgnoreCase(companhia))
-                .filter(v -> gasto == null || v.calcularTotalGastos() > gasto)
+                .filter(v -> v.getLugarDeChegada() != null && v.getLugarDeChegada().toLowerCase().startsWith(destino))
+                .filter(v -> v.getSaldo() >= gasto)
+                .filter(v -> companhia.isEmpty() || (v.getCompanhia() != null && v.getCompanhia().toLowerCase().startsWith(companhia)))
                 .collect(Collectors.toList());
     }
 

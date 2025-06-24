@@ -1,21 +1,28 @@
 package frontend.framesUI;
 
-import backend.main.entities.Viajante;
+import backend.main.entities.*;
+import backend.main.repositories.ViagemRepository;
+import backend.main.services.ViagemService;
 
 import javax.swing.*;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseEvent;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DetalhesViagemFrame {
 
+    private int idViagem;
     private final JPanel mainPanel;
     private JPanel mainPanelWrapper;
 
@@ -79,6 +86,108 @@ public class DetalhesViagemFrame {
         };
         inputSaldo.getDocument().addDocumentListener(updateResultadoListener);
         inputValorGasto.getDocument().addDocumentListener(updateResultadoListener);
+
+        btnSalvar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                boolean dataValida = true;
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                for (AtividadeEntry entry : atividadeEntries) {
+                    try {
+                        String textoData = entry.dataField.getText();
+                        String textoHora = entry.horarioField.getText();
+                        LocalDateTime.parse(textoData+" "+textoHora, formatter);
+                    } catch (Exception ex) {
+                        dataValida = false;
+                        JOptionPane.showMessageDialog(mainPanel,
+                                "Data inválida em uma atividade! Use o formato: dd/MM/yyyy HH:mm",
+                                "Erro de validação", JOptionPane.ERROR_MESSAGE);
+                        break;
+                    }
+                }
+
+                if (dataValida) {
+                    try {
+                        String lugarDePartida = inputLugarPartida.getText();
+                        String lugarDeChegada = inputLugarChegada.getText();
+                        String dataSaida = inputDataSaida.getText();
+                        String dataChegada = inputDataChegada.getText();
+                        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                        LocalDate dataSaidaDate = LocalDate.parse(dataSaida, dateTimeFormatter);
+                        LocalDate dataChegadaDate = LocalDate.parse(dataChegada, dateTimeFormatter);
+                        String saldoLimpo = inputSaldo.getText()
+                                .replace("R$", "")
+                                .replace(" ", "")
+                                .replace(".", "")
+                                .replace(",", ".");
+                        double saldo = Double.parseDouble(saldoLimpo);
+                        String companhia = inputCompanhia.getText();
+                        List<Deslocamento> deslocamentos = new ArrayList<>();
+                        for (DeslocamentoEntry deslocamentoEntry : deslocamentoEntries){
+                            String custoLimpo = deslocamentoEntry.custoField.getText()
+                                    .replace("R$", "")
+                                    .replace(" ", "")
+                                    .replace(".", "")
+                                    .replace(",", ".");
+                            double custo = Double.parseDouble(custoLimpo);
+                            String meioTransporte = deslocamentoEntry.meioTransporteField.getText();
+                            Deslocamento deslocamento = new Deslocamento(meioTransporte, custo);
+                            deslocamentos.add(deslocamento);
+                        }
+                        List<Hospedagem> hospedagens = new ArrayList<>();
+                        for (HospedagemEntry hospedagemEntry : hospedagemEntries){
+                            String nomeLocalHospedagem = hospedagemEntry.nomeLocalField.getText();
+                            int numeroDeNoites = Integer.parseInt(hospedagemEntry.noitesField.getText());
+                            String valorDiariaLimpo = hospedagemEntry.valorDiariaField.getText()
+                                    .replace("R$", "")
+                                    .replace(" ", "")
+                                    .replace(".", "")
+                                    .replace(",", ".");
+                            double valorDiaria = Double.parseDouble(valorDiariaLimpo);
+                            Hospedagem hospedagem = new Hospedagem(nomeLocalHospedagem, numeroDeNoites, valorDiaria);
+                            hospedagens.add(hospedagem);
+                        }
+                        List<Atividade> atividades = new ArrayList<>();
+                        for (AtividadeEntry atividadeEntry : atividadeEntries){
+                            String textoData = atividadeEntry.dataField.getText();
+                            String textoHora = atividadeEntry.horarioField.getText();
+                            LocalDateTime dataAtividade = LocalDateTime.parse(textoData + " " + textoHora, formatter);
+                            String gastoAtividadeLimpo = atividadeEntry.custoField.getText()
+                                    .replace("R$", "")
+                                    .replace(" ", "")
+                                    .replace(".", "")
+                                    .replace(",", ".");
+                            double gastoAtividade = Double.parseDouble(gastoAtividadeLimpo);
+                            String nomeAtividade = atividadeEntry.nomeField.getText();
+                            String tipoAtividade = String.valueOf(atividadeEntry.tipoCombo.getSelectedItem());
+
+                            if (tipoAtividade.equals("Evento")){
+                                String temaEvento = atividadeEntry.temaField.getText();
+                                Evento evento = new Evento(nomeAtividade, gastoAtividade, dataAtividade, temaEvento);
+                                atividades.add(evento);
+                            } else if (tipoAtividade.equals("Passeio")){
+                                String nomeLocalPasseio = atividadeEntry.nomeLocalField.getText();
+                                Passeio passeio = new Passeio(nomeAtividade, gastoAtividade, dataAtividade, nomeLocalPasseio);
+                                atividades.add(passeio);
+                            } else if (tipoAtividade.equals("Restaurante")){
+                                String nomeRestaurante = atividadeEntry.nomeRestauranteField.getText();
+                                String culinariaRestaurante = atividadeEntry.culinariaField.getText();
+                                String pratoRestaurante = atividadeEntry.pratoField.getText();
+                                Restaurante restaurante = new Restaurante(nomeAtividade, gastoAtividade, dataAtividade, nomeRestaurante, culinariaRestaurante, pratoRestaurante);
+                                atividades.add(restaurante);
+                            }
+                        }
+                        Viagem viagem = new Viagem(lugarDePartida, lugarDeChegada, deslocamentos, hospedagens, saldo, companhia, atividades, viajante.getEmail(), dataChegadaDate, dataSaidaDate);
+                        ViagemRepository viagemRepository = new ViagemRepository("viagem.ser");
+                        ViagemService viagemService = new ViagemService(viagemRepository);
+                        viagemService.editarViagem(idViagem, viagem, viajante);
+                        JOptionPane.showMessageDialog(mainPanel, "Viagem cadastrada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(mainPanel, "Erro ao fazer cadastro de viagem! Credenciais inválidas, tente novamente!", "Erro", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
     }
 
     private void montarTopo() {
@@ -562,8 +671,14 @@ public class DetalhesViagemFrame {
 
     private void atualizarResultado() {
         try {
-            double saldo = Double.parseDouble(inputSaldo.getText().replace(",", "."));
-            double gasto = Double.parseDouble(inputValorGasto.getText().replace(",", "."));
+            double saldo = Double.parseDouble(inputSaldo.getText().replace("R$", "")
+                    .replace(" ", "")
+                    .replace(".", "")
+                    .replace(",", "."));
+            double gasto = Double.parseDouble(inputValorGasto.getText().replace("R$", "")
+                    .replace(" ", "")
+                    .replace(".", "")
+                    .replace(",", "."));
             double res = saldo - gasto;
             inputResultado.setText(String.format("%.2f", res));
         } catch (Exception e) {
@@ -757,6 +872,7 @@ public class DetalhesViagemFrame {
 
 
     public void carregarDadosViagem(
+            int id,
             String lugarPartida,
             String lugarChegada,
             String saldo,
@@ -769,6 +885,7 @@ public class DetalhesViagemFrame {
             List<AtividadeDados> listaAtividades,
             List<DeslocamentoDados> listaDeslocamentos
     ) {
+        this.idViagem = id;
         inputLugarPartida.setText(lugarPartida);
         inputLugarChegada.setText(lugarChegada);
         inputSaldo.setText(saldo);

@@ -45,24 +45,12 @@ public class ViagemService {
         return viagensListadas;
     }
 
-    public Viagem buscarViagemPorId(int id, Viajante viajante){
-        Viagem viagem = viagemRepository.buscarViagemPorId(id, viajante.getEmail());
-        if (viagem == null){
-            throw new EntidadeNaoEncontradaException("Viagem com id: "+id+", não encontrada!");
-        }
-        return viagem;
-    }
-
     public List<Viagem> buscarViagensFiltradas(String emailViajante, String destino, String companhia, Double gasto){
-        List<Viagem> viagens = viagemRepository.buscarViagensFiltradas(emailViajante, destino, companhia, gasto);
-        if (viagens.isEmpty()){
-            throw new SemResultadoException("Não há resultados para o filtro aplicado");
-        }
-        return viagens;
+        return viagemRepository.buscarViagensFiltradas(emailViajante, destino, companhia, gasto);
     }
 
     public List<Viagem> buscarTodasViagensPorEmailViajante(String emailViajante){
-        return buscarTodasViagensPorEmailViajante(emailViajante);
+        return viagemRepository.buscarViagensPorEmailViajante(emailViajante);
     }
 
     public void removerViagem(int id, Viajante viajante){

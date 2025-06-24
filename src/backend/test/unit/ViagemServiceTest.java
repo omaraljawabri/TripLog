@@ -99,34 +99,6 @@ class ViagemServiceTest {
     }
 
     @Test
-    void buscarViagemPorId_RetornaViagem_QuandoIdDaViagemBuscadoExistir() {
-        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
-        ViagemService viagemService = new ViagemService(viagemRepository);
-        Viagem viagem = criarViagem1();
-        Viagem viagem2 = criarViagem2();
-        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com");
-
-        viagemService.adicionarViagem(viagem, viajante);
-        viagemService.adicionarViagem(viagem2, viajante);
-
-        Viagem viagemBuscada = viagemService.buscarViagemPorId(viagem.getId(), viajante);
-
-        assertNotNull(viagemBuscada);
-        assertEquals(viagem.getId(), viagemBuscada.getId());
-    }
-
-    @Test
-    void buscarViagemPorId_LancaEntityNotFoundException_QuandoNaoHouverViagemComIdPassado(){
-        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
-        ViagemService viagemService = new ViagemService(viagemRepository);
-        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com");
-
-        EntidadeNaoEncontradaException exception = assertThrows(EntidadeNaoEncontradaException.class, () -> viagemService.buscarViagemPorId(2, viajante));
-
-        assertEquals("Viagem com id: 2, não encontrada!", exception.getMessage());
-    }
-
-    @Test
     void removerViagem_RemoveViagem_QuandoIdDaViagemPassadoExistir() {
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
         ViagemService viagemService = new ViagemService(viagemRepository);
@@ -241,16 +213,15 @@ class ViagemServiceTest {
     }
 
     @Test
-    void buscarViagensFiltradas_LancaSemResultadoException_QuandoNaoHouveremViagensComDestinoAplicado(){
+    void buscarViagensFiltradas_RetornaListaDeViagemVazia_QuandoNaoHouveremViagensComDestinoAplicado(){
         Viagem viagem = criarViagem1();
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
         ViagemService viagemService = new ViagemService(viagemRepository);
 
         viagemRepository.salvarViagem(viagem);
 
-        SemResultadoException exception = assertThrows(SemResultadoException.class, () -> viagemService.buscarViagensFiltradas("fulano@example.com", "Goiânia", null, null));
-
-        assertEquals("Não há resultados para o filtro aplicado", exception.getMessage());
+        List<Viagem> viagens = viagemService.buscarViagensFiltradas("fulano@example.com", "sp", null, null);
+        assertTrue(viagens.isEmpty());
     }
 
     @Test
@@ -261,9 +232,8 @@ class ViagemServiceTest {
 
         viagemRepository.salvarViagem(viagem);
 
-        SemResultadoException exception = assertThrows(SemResultadoException.class, () -> viagemService.buscarViagensFiltradas("fulano@example.com", null, "Felipe", null));
-
-        assertEquals("Não há resultados para o filtro aplicado", exception.getMessage());
+        List<Viagem> viagens = viagemService.buscarViagensFiltradas("fulano@example.com", null, "Fulano", null);
+        assertTrue(viagens.isEmpty());
     }
 
     @Test
@@ -274,11 +244,8 @@ class ViagemServiceTest {
 
         viagemRepository.salvarViagem(viagem);
 
-        double gasto = 50000;
-
-        SemResultadoException exception = assertThrows(SemResultadoException.class, () -> viagemService.buscarViagensFiltradas("fulano@example.com", null, null, gasto));
-
-        assertEquals("Não há resultados para o filtro aplicado", exception.getMessage());
+        List<Viagem> viagens = viagemService.buscarViagensFiltradas("fulano@example.com", null, null, 60000D);
+        assertTrue(viagens.isEmpty());
     }
 
     @Test

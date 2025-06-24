@@ -68,6 +68,18 @@ public class Viagem implements Serializable {
         return lugarDeChegada;
     }
 
+    public double getSaldo() {
+        return saldo;
+    }
+
+    public LocalDate getDataChegada() {
+        return dataChegada;
+    }
+
+    public LocalDate getDataTermino() {
+        return dataTermino;
+    }
+
     public void setLugarDeChegada(String lugarDeChegada) {
         this.lugarDeChegada = lugarDeChegada;
     }

@@ -77,28 +77,6 @@ class ViagemRepositoryTest {
     }
 
     @Test
-    void buscarViagemPorId_RetornaViagemComIdPassado_QuandoIdPassadoExistir() {
-        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO);
-        Viagem viagem1 = criarViagem1();
-
-        viagemRepository.salvarViagem(viagem1);
-
-        Viagem viagem = viagemRepository.buscarViagemPorId(viagem1.getId(), viagem1.getEmailViajante());
-
-        assertNotNull(viagem);
-        assertEquals(viagem.getId(), viagem1.getId());
-    }
-
-    @Test
-    void buscarViagemPorId_RetornaNull_QuandoIdPassadoNaoExistir(){
-        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO);
-
-        Viagem viagem = viagemRepository.buscarViagemPorId(1, "fulano@example.com");
-
-        assertNull(viagem);
-    }
-
-    @Test
     void removerViagemPorId_RetornaTrue_QuandoViagemERemovidaComSucesso() {
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO);
         Viagem viagem = criarViagem1();
