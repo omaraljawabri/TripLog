@@ -155,7 +155,7 @@ public class MainFrame extends JFrame {
 
         // Formate os dados para passar para a tela de detalhes
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        String dataChegadaStr = viagem.getDataChegada() != null ? viagem.getDataChegada().format(formatter) : "";
+        String dataChegadaStr = viagem.getDataDeInicio() != null ? viagem.getDataDeInicio().format(formatter) : "";
         String dataTerminoStr = viagem.getDataTermino() != null ? viagem.getDataTermino().format(formatter) : "";
 
         detalhesViagemFrame.carregarDadosViagem(

@@ -52,7 +52,7 @@ class ViagemTest {
         viagem1.setLugarDePartida("Rio de Janeiro");
         viagem1.setLugarDeChegada("Salvador");
         viagem1.setCompanhia("João");
-        viagem1.setDataChegada(LocalDate.of(2025, 6, 10));
+        viagem1.setDataDeInicio(LocalDate.of(2025, 6, 10));
         viagem1.setDataTermino(LocalDate.of(2025, 6, 17));
 
         viagem1.setDeslocamentos(List.of(
