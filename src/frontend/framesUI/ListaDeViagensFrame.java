@@ -29,6 +29,9 @@ public class ListaDeViagensFrame {
     private final Consumer<Viagem> onExcluir;
     private final ActionListener btnVoltarListener;
 
+    private final ViagemRepository viagemRepository = new ViagemRepository("viagem.ser");
+    private final ViagemService viagemService = new ViagemService(viagemRepository);
+
     private final JButton btnAdicionarViagem = new JButton("Adicionar Viagem");
     private final JButton btnAtualizarLista = new JButton("Atualizar Lista");
 
@@ -225,6 +228,7 @@ public class ListaDeViagensFrame {
             String dataTerminoStr = v.getDataTermino() != null ? v.getDataTermino().format(formatter) : "";
 
             detalhesFrame.carregarDadosViagem(
+                    v.getId(),
                     v.getLugarDePartida(),
                     v.getLugarDeChegada(),
                     String.format("R$ %.2f", v.getSaldo()),
@@ -253,7 +257,7 @@ public class ListaDeViagensFrame {
         btnExcluir.setPreferredSize(new Dimension(100, 32));
         btnExcluir.addActionListener(e -> {
             onExcluir.accept(v);
-            viagens.remove(v);
+            viagemService.removerViagem(v.getId(), viajante);
             atualizarLista();
         });
 
@@ -275,8 +279,6 @@ public class ListaDeViagensFrame {
         double min = parseDouble(txtFiltroSaldoMin.getText(), Double.NEGATIVE_INFINITY);
         String companhiaFiltro = txtFiltroCompanhia.getText().trim().toLowerCase();
 
-        ViagemRepository viagemRepository = new ViagemRepository("viagem.ser");
-        ViagemService viagemService = new ViagemService(viagemRepository);
         List<Viagem> viagens = viagemService.buscarViagensFiltradas(viajante.getEmail(), destinoFiltro, companhiaFiltro, min);
         this.viagens.clear();
         this.viagens.addAll(viagens);
