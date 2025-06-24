@@ -7,15 +7,39 @@ import backend.main.exceptions.ValidacaoException;
 import backend.main.repositories.ViajanteRepository;
 import backend.main.utils.SenhaUtil;
 
+/**
+ * Classe responsável pelas regras de negócio ligadas as operações de edição e busca de id da entidade Viajante.
+ * Essa classe se comunica com a camada repository {@link ViajanteRepository} para buscar as informações dos arquivos e também
+ * se comunica com a camada do frontend para exibir informações na tela.
+ * */
 public class ViajanteService {
 
     // Injeção de dependências
     private final ViajanteRepository viajanteRepository;
 
+    /**
+     * Construtor que recebe a camada repository para fazer as operações e chamar os métodos que ligam ao arquivo.
+     * Conceito de injeção de dependências foi utilizado.
+     *
+     * @param viajanteRepository Classe repository que se comunicará com o service.
+     * */
     public ViajanteService(ViajanteRepository viajanteRepository) {
         this.viajanteRepository = viajanteRepository;
     }
 
+    /**
+     * Método responsável por editar um viajante, inicialmente validando as informações do viajante e posteriormente
+     * chamando a camada repository para concluir a edição.
+     *
+     * @param email Email do viajante que será editado
+     * @param nome Nome do viajante a ser editado
+     * @param senhaAntiga Senha salva anteriormente do viajante para caráter de validação
+     * @param senhaNova Nova senha do viajante que será salva
+     *
+     * @exception EntidadeNaoEncontradaException em caso de não haver viajante com email passado como parâmetro salvo no arquivo
+     * @exception ValidacaoException em caso da senha antiga passada como parâmetro não ser igual a senha salva no arquivo
+     * @exception ErroInternoException em caso de algum erro na edição do viajante como, por exemplo, erro no acesso ao arquivo
+     * */
     public void editarViajante(String email, String nome, String senhaAntiga, String senhaNova){
         Viajante viajante = viajanteRepository.buscarViajantePorEmail(email);
         if (viajante == null){
@@ -34,6 +58,11 @@ public class ViajanteService {
         }
     }
 
+    /**
+     * Método responsável por chamar a camada repository e retornar o maior id de um viajante salvo em arquivo no momento
+     *
+     * @return Maior id de viajante salvo no arquivo até o momento
+     * */
     public int buscarMaiorId(){
         return viajanteRepository.buscarMaiorId();
     }
