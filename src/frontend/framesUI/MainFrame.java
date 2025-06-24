@@ -1,14 +1,13 @@
 package frontend.framesUI;
 
 import backend.main.entities.Viajante;
-import backend.main.repositories.ViagemRepository;
-import backend.main.services.ViagemService;
 import com.formdev.flatlaf.FlatLightLaf;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import backend.main.entities.Viagem;
 
 public class MainFrame extends JFrame {
 
@@ -23,7 +22,7 @@ public class MainFrame extends JFrame {
     private ListaDeViagensFrame listaDeViagensFrame;
 
     private Viajante usuarioLogado;
-    private final List<ListaDeViagensFrame.Viagem> viagens = new ArrayList<>();
+    private final List<Viagem> viagens = new ArrayList<>();
 
     public MainFrame() {
         setTitle("Sistema de Acesso");
@@ -101,29 +100,12 @@ public class MainFrame extends JFrame {
         perfil = new ProfileUserFrame(viajante);
 
         perfil.setBtnInicioListener(() -> abrirHome(usuarioLogado));
+        perfil.getBtnListaViagens().addActionListener(e -> abrirListaDeViagens());
         perfil.getBtnLogout().addActionListener(e -> {
             JOptionPane.showMessageDialog(this, "Logout efetuado!");
             usuarioLogado = null;
             cardLayout.show(cardPanel, "login");
         });
-
-        ViagemService viagemService = new ViagemService(new ViagemRepository("viagem.ser"));
-        List<backend.main.entities.Viagem> viagensBack = viagemService.buscarTodasViagensPorEmailViajante(this.usuarioLogado.getEmail());
-
-        List<ListaDeViagensFrame.Viagem> viagensFront = viagensBack.stream()
-                .map(MainFrame::converterParaFrontend)
-                .toList();
-
-        // ✅ Atualize a lista global para usar depois
-        this.viagens.clear();
-        this.viagens.addAll(viagensFront);
-
-        perfil.setBtnListaViagensListener(
-                this,
-                viagensFront,
-                () -> abrirPerfil(usuarioLogado),
-                this::abrirCadastroViagem
-        );
 
         cardPanel.add(perfil.getPanel(), "perfil");
         cardLayout.show(cardPanel, "perfil");
@@ -131,46 +113,21 @@ public class MainFrame extends JFrame {
         repaint();
     }
 
-    public static ListaDeViagensFrame.Viagem converterParaFrontend(backend.main.entities.Viagem v) {
-        return new ListaDeViagensFrame.Viagem(
-                v.getLugarDeChegada(),
-                v.calcularDiasDeViagem(),
-                v.calcularTotalGastos()
-        );
-    }
-
     public void abrirListaDeViagens() {
-        if (usuarioLogado == null) {
-            JOptionPane.showMessageDialog(this, "Usuário não está logado.");
-            return;
-        }
-
-        ViagemService viagemService = new ViagemService(new ViagemRepository("viagem.ser"));
-        List<backend.main.entities.Viagem> viagensBack = viagemService.buscarTodasViagensPorEmailViajante(usuarioLogado.getEmail());
-
-        List<ListaDeViagensFrame.Viagem> viagensFront = viagensBack.stream()
-                .map(MainFrame::converterParaFrontend)
-                .toList();
-
-        // Atualize a lista global para usar depois
-        this.viagens.clear();
-        this.viagens.addAll(viagensFront);
-
         listaDeViagensFrame = new ListaDeViagensFrame(
-                viagensFront,
-                viagem -> JOptionPane.showMessageDialog(this, "Abrindo detalhes de: " + viagem.getLugarChegada()),
+                usuarioLogado,                          // Viajante
+                usuarioLogado.getViagens(),            // Lista de viagens dele
+                viagem -> JOptionPane.showMessageDialog(this, "Abrindo detalhes de: " + viagem.getLugarDeChegada()),
                 viagem -> {
-                    JOptionPane.showMessageDialog(this, "Viagem para " + viagem.getLugarChegada() + " excluída!");
-                    viagens.remove(viagem);
-                    // Você pode adicionar aqui lógica para excluir da base, se quiser
-                    listaDeViagensFrame.atualizarListaPublic(); // se esse método existir para atualizar a lista visual
+                    JOptionPane.showMessageDialog(this, "Viagem para " + viagem.getLugarDeChegada() + " excluída!");
+                    usuarioLogado.getViagens().remove(viagem);
+                    listaDeViagensFrame.atualizarListaPublic(); // Atualiza após remoção
                 },
                 e -> abrirPerfil(usuarioLogado),
                 e -> abrirCadastroViagem()
         );
 
-        cardPanel.add(listaDeViagensFrame.getPanel(), "listaViagens");
-        cardLayout.show(cardPanel, "listaViagens");
+        setContentPane(listaDeViagensFrame.getPanel());
         revalidate();
         repaint();
     }

@@ -81,9 +81,9 @@ public class ViagemRepository {
         List<Viagem> viagens = buscarViagensPorEmailViajante(emailViajante);
 
         return viagens.stream()
-                .filter(v -> destino == null || v.getLugarDeChegada().equalsIgnoreCase(destino))
-                .filter(v -> companhia == null || v.getCompanhia().equalsIgnoreCase(companhia))
-                .filter(v -> gasto == null || v.calcularTotalGastos() > gasto)
+                .filter(v -> v.getLugarDeChegada() != null && v.getLugarDeChegada().toLowerCase().startsWith(destino))
+                .filter(v -> v.getSaldo() >= gasto)
+                .filter(v -> companhia.isEmpty() || (v.getCompanhia() != null && v.getCompanhia().toLowerCase().startsWith(companhia)))
                 .collect(Collectors.toList());
     }
 

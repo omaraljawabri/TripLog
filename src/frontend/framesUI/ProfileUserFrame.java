@@ -1,5 +1,6 @@
 package frontend.framesUI;
 
+import backend.main.entities.Viagem;
 import backend.main.entities.Viajante;
 import backend.main.repositories.ViajanteRepository;
 import backend.main.services.ViajanteService;
@@ -267,18 +268,21 @@ public class ProfileUserFrame {
     }
 
     public void setBtnListaViagensListener(JFrame framePai,
-                                           List<ListaDeViagensFrame.Viagem> viagens,
+                                           Viajante viajante,
                                            Runnable abrirPerfilCallback,
-                                           Runnable abrirCadastroCallback){
+                                           Runnable abrirCadastroCallback) {
         btnListaViagens.addActionListener(e -> {
             ListaDeViagensFrame lista = new ListaDeViagensFrame(
-                    viagens,
-                    v -> JOptionPane.showMessageDialog(framePai,"Detalhes de "+v.getLugarChegada()),
-                    v -> JOptionPane.showMessageDialog(framePai,"Excluída "+v.getLugarChegada()),
+                    viajante,
+                    viajante.getViagens(),
+                    v -> JOptionPane.showMessageDialog(framePai, "Detalhes de " + v.getLugarDeChegada()),
+                    v -> JOptionPane.showMessageDialog(framePai, "Excluída " + v.getLugarDeChegada()),
                     evt -> abrirPerfilCallback.run(),
-                    evt -> abrirCadastroCallback.run());
+                    evt -> abrirCadastroCallback.run()
+            );
             framePai.setContentPane(lista.getPanel());
-            framePai.revalidate(); framePai.repaint();
+            framePai.revalidate();
+            framePai.repaint();
         });
     }
 }

@@ -54,11 +54,7 @@ public class ViagemService {
     }
 
     public List<Viagem> buscarViagensFiltradas(String emailViajante, String destino, String companhia, Double gasto){
-        List<Viagem> viagens = viagemRepository.buscarViagensFiltradas(emailViajante, destino, companhia, gasto);
-        if (viagens.isEmpty()){
-            throw new SemResultadoException("Não há resultados para o filtro aplicado");
-        }
-        return viagens;
+        return viagemRepository.buscarViagensFiltradas(emailViajante, destino, companhia, gasto);
     }
 
     public List<Viagem> buscarTodasViagensPorEmailViajante(String emailViajante){
