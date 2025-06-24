@@ -1,9 +1,13 @@
 package backend.main.entities;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 public abstract class Atividade implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -2063544862544769327L;
+
     private String nome;
     private double gasto;
     private LocalDateTime data;

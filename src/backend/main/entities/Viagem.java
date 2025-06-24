@@ -1,5 +1,6 @@
 package backend.main.entities;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -7,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Viagem implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -2543523212611914182L;
+
     private static int contador;
     private int id;
     private String lugarDePartida;
@@ -150,5 +154,9 @@ public class Viagem implements Serializable {
             return (int) ChronoUnit.DAYS.between(this.dataChegada, this.dataTermino);
         }
         return 0;
+    }
+
+    public static void resetarContador(){
+        Viagem.contador = 0;
     }
 }

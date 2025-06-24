@@ -1,8 +1,12 @@
 package backend.main.entities;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class Deslocamento implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -7505069781177437456L;
+
     private String meioDeTransporte;
     private double custo;
 
