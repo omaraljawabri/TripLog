@@ -68,13 +68,22 @@ public class ViagemRepository {
         }
     }
 
-    public List<Viagem> buscarViagensFiltradas(String emailViajante, String destino, String companhia, Double gasto){
+    public List<Viagem> buscarViagensFiltradas(String emailViajante, String destino, String companhia, Double gasto) {
         List<Viagem> viagens = buscarViagensPorEmailViajante(emailViajante);
 
         return viagens.stream()
-                .filter(v -> v.getLugarDeChegada() != null && v.getLugarDeChegada().toLowerCase().startsWith(destino))
-                .filter(v -> v.getSaldo() >= gasto)
-                .filter(v -> companhia.isEmpty() || (v.getCompanhia() != null && v.getCompanhia().toLowerCase().startsWith(companhia)))
+                .filter(v -> {
+                    String chegada = v.getLugarDeChegada();
+                    return destino == null || (chegada != null && chegada.toLowerCase().startsWith(destino.toLowerCase()));
+                })
+                .filter(v -> {
+                    Double saldo = v.getSaldo();
+                    return gasto == null || (saldo != null && saldo >= gasto);
+                })
+                .filter(v -> {
+                    String comp = v.getCompanhia();
+                    return companhia == null || (comp != null && comp.toLowerCase().startsWith(companhia.toLowerCase()));
+                })
                 .collect(Collectors.toList());
     }
 
@@ -98,5 +107,17 @@ public class ViagemRepository {
             }
         }
         return false;
+    }
+
+    public int buscarMaiorIdPorEmailViajante(String emailViajante){
+        List<Viagem> viagens = buscarViagensPorEmailViajante(emailViajante);
+
+        int maiorId = 0;
+        for (Viagem viagem : viagens){
+            if (viagem.getId() > maiorId){
+                maiorId = viagem.getId();
+            }
+        }
+        return maiorId;
     }
 }

@@ -66,4 +66,8 @@ public class ViagemService {
             throw new EntidadeNaoEncontradaException("Viagem com id: "+id+", não encontrada!");
         }
     }
+
+    public int buscarMaiorIdPorEmailViajante(String emailViajante){
+        return viagemRepository.buscarMaiorIdPorEmailViajante(emailViajante);
+    }
 }
