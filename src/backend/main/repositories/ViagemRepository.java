@@ -116,8 +116,8 @@ public class ViagemRepository {
                     return destino == null || (chegada != null && chegada.toLowerCase().startsWith(destino.toLowerCase()));
                 })
                 .filter(v -> {
-                    Double saldo = v.getSaldo();
-                    return gasto == null || (saldo != null && saldo >= gasto);
+                    Double gastoTotal = v.calcularTotalGastos();
+                    return gasto == null || (gastoTotal != null && gastoTotal >= gasto);
                 })
                 .filter(v -> {
                     String comp = v.getCompanhia();
