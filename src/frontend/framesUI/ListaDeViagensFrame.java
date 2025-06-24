@@ -209,7 +209,7 @@ public class ListaDeViagensFrame {
 
         gbc.gridx = 2;
         gbc.insets = new Insets(6, 100, 6, 15);
-        JLabel valorValor = colunaTexto(String.format("R$ %.2f", v.getSaldo()));
+        JLabel valorValor = colunaTexto(String.format("R$ %.2f", v.calcularTotalGastos()));
         valorValor.setPreferredSize(new Dimension(120, 24));
         linha.add(valorValor, gbc);
 
@@ -223,8 +223,6 @@ public class ListaDeViagensFrame {
         btnDetalhes.addActionListener(e -> {
             onVerDetalhes.accept(v);
         });
-
-
 
         JButton btnExcluir = new JButton("Excluir");
         styleRemoveButton(btnExcluir);
