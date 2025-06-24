@@ -71,7 +71,7 @@ public class HomeFrame {
         contentPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
         /* ---------- Título ---------- */
-        title = new JLabel("Bem-vindo, " + viajante.getNome() + ", ao TravelPOO!");
+        title = new JLabel("Boas-vindas, " + viajante.getNome() + ", ao TripLog!");
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
         title.setForeground(new Color(33, 70, 120));
         contentPanel.add(title);
@@ -80,11 +80,12 @@ public class HomeFrame {
         /* ---------- Descrição ---------- */
         description = new JTextArea(
                 "Aqui você pode registrar suas viagens, passeios, gastos e muito mais.\n\n" +
-                        "➡ Para começar, clique em \"Cadastrar nova viagem\" e preencha detalhes como destinos, " +
-                        "restaurantes, eventos e valores gastos.\n\n" +
-                        "➡ Se quiser rever ou editar percursos que já cadastrou, escolha \"Minhas viagens\". " +
-                        "Lá você encontra todas as suas viagens organizadas em um só lugar!\n\n" +
-                        "Boa jornada e divirta-se usando o TravelPOO!"
+                        "➡ Para começar, clique em \"Cadastrar nova viagem\" e preencha detalhes com dados da viagem, " +
+                        "hospedagem, deslocamento e atividades realizadas, como eventos, restaurantes e os valores gastos.\n\n" +
+                        "➡ Para rever ou editar viagens já cadastradas, escolha \"Minhas viagens\". " +
+                        "Lá, você encontra todas as suas viagens organizadas em um só lugar!\n\n" +
+                        "➡ Acesse seu perfil clicando em \" Meu perfil\". \n\n" +
+                        "Boa jornada e divirta-se usando o TripLog!"
         );
         description.setOpaque(false);
         description.setEditable(false);

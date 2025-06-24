@@ -36,7 +36,7 @@ public class LoginFrame {
         title.setFont(new Font("SansSerif", Font.BOLD, 24));
         title.setForeground(new Color(33, 70, 120));
 
-        JLabel subtitle = new JLabel("Bem-vindo de volta ao TravelPOO!");
+        JLabel subtitle = new JLabel("Boas-vindas ao TripLog!");
         subtitle.setFont(new Font("SansSerif", Font.PLAIN, 14));
         subtitle.setForeground(new Color(80, 80, 80));
 

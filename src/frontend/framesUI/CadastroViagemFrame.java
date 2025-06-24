@@ -285,7 +285,7 @@ public class CadastroViagemFrame {
         JButton btnAddHosp = new JButton("Adicionar");
         styleAddButton(btnAddHosp);
         btnAddHosp.addActionListener(e -> addHospedagemEntry());
-        JPanel btnP = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel btnP = new JPanel(new FlowLayout(FlowLayout.LEFT, -5, 5));
         btnP.setBackground(Color.WHITE);
         btnP.add(btnAddHosp);
         hospedagemPanel.add(btnP, BorderLayout.SOUTH);
@@ -317,7 +317,7 @@ public class CadastroViagemFrame {
         JButton btnAddAtv = new JButton("Adicionar");
         styleAddButton(btnAddAtv);
         btnAddAtv.addActionListener(e -> addAtividadeEntry());
-        JPanel btnP = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel btnP = new JPanel(new FlowLayout(FlowLayout.LEFT, -5, 5));
         btnP.setBackground(Color.WHITE);
         btnP.add(btnAddAtv);
         atividadesPanel.add(btnP, BorderLayout.SOUTH);
@@ -349,7 +349,7 @@ public class CadastroViagemFrame {
         JButton btnAddDesl = new JButton("Adicionar");
         styleAddButton(btnAddDesl);
         btnAddDesl.addActionListener(e -> addDeslocamentoEntry());
-        JPanel btnP = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel btnP = new JPanel(new FlowLayout(FlowLayout.LEFT, -5, 5));
         btnP.setBackground(Color.WHITE);
         btnP.add(btnAddDesl);
         deslocPanel.add(btnP, BorderLayout.SOUTH);
