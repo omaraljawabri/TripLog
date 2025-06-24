@@ -5,6 +5,7 @@ import com.formdev.flatlaf.FlatLightLaf;
 
 import javax.swing.*;
 import java.awt.*;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import backend.main.entities.Viagem;
@@ -20,6 +21,7 @@ public class MainFrame extends JFrame {
     private HomeFrame home;
     private ProfileUserFrame perfil;
     private ListaDeViagensFrame listaDeViagensFrame;
+    private DetalhesViagemFrame detalhesViagemFrame;
 
     private Viajante usuarioLogado;
     private final List<Viagem> viagens = new ArrayList<>();
@@ -80,6 +82,7 @@ public class MainFrame extends JFrame {
 
             cadastroViagem = new CadastroViagemFrame(usuarioLogado);
             cadastroViagem.addCancelarListener(e -> voltarParaHomeOuLogin());
+            cadastroViagem.addSalvarComSucessoListener(e -> abrirListaDeViagens());
 
             cardPanel.add(cadastroViagem.getPanel(), "cadastroViagem");
             revalidate();
@@ -118,10 +121,11 @@ public class MainFrame extends JFrame {
             cardPanel.remove(listaDeViagensFrame.getPanel());
         }
 
+
         listaDeViagensFrame = new ListaDeViagensFrame(
                 usuarioLogado,
                 usuarioLogado.getViagens(),
-                viagem -> JOptionPane.showMessageDialog(this, "Abrindo detalhes de: " + viagem.getLugarDeChegada()),
+                this::abrirDetalhesViagem,  // referencia ao método para abrir detalhes
                 viagem -> {
                     JOptionPane.showMessageDialog(this, "Viagem para " + viagem.getLugarDeChegada() + " excluída!");
                     usuarioLogado.getViagens().remove(viagem);
@@ -133,6 +137,46 @@ public class MainFrame extends JFrame {
 
         cardPanel.add(listaDeViagensFrame.getPanel(), "listaViagens");
         cardLayout.show(cardPanel, "listaViagens");
+        revalidate();
+        repaint();
+    }
+
+    public void abrirDetalhesViagem(Viagem viagem) {
+        if (usuarioLogado == null) {
+            JOptionPane.showMessageDialog(this, "Usuário não está logado.");
+            return;
+        }
+
+        if (detalhesViagemFrame != null) {
+            cardPanel.remove(detalhesViagemFrame.getPanel());
+        }
+
+        detalhesViagemFrame = new DetalhesViagemFrame(usuarioLogado);
+
+        // Formate os dados para passar para a tela de detalhes
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String dataChegadaStr = viagem.getDataChegada() != null ? viagem.getDataChegada().format(formatter) : "";
+        String dataTerminoStr = viagem.getDataTermino() != null ? viagem.getDataTermino().format(formatter) : "";
+
+        detalhesViagemFrame.carregarDadosViagem(
+                viagem.getId(),
+                viagem.getLugarDePartida(),
+                viagem.getLugarDeChegada(),
+                String.format("R$ %.2f", viagem.getSaldo()),
+                String.format("R$ %.2f", viagem.calcularTotalGastos()),
+                dataChegadaStr,
+                dataTerminoStr,
+                String.valueOf(viagem.calcularDiasDeViagem()),
+                viagem.getCompanhia(),
+                listaDeViagensFrame.getHospedagensAsDados(viagem.getHospedagens()),
+                listaDeViagensFrame.getAtividadesAsDados(viagem.getAtividades()),
+                listaDeViagensFrame.getDeslocamentosAsDados(viagem.getDeslocamentos())
+        );
+
+        detalhesViagemFrame.addCancelarListener(e -> abrirListaDeViagens());
+
+        cardPanel.add(detalhesViagemFrame.getPanel(), "detalhesViagem");
+        cardLayout.show(cardPanel, "detalhesViagem");
         revalidate();
         repaint();
     }
