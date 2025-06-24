@@ -1,6 +1,7 @@
 package backend.test.unit;
 
 import backend.main.entities.*;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -13,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ViagemTest {
 
     @Test
+    @DisplayName("calcularTotalGastos deve retornar os gastos totais da viagem quando houverem gastos na viagem")
     void calcularTotalGastos_RetornaGastoTotalDaViagem_QuandoHouveremGastos() {
         Viagem viagem = criarViagem1();
 
@@ -20,6 +22,7 @@ class ViagemTest {
     }
 
     @Test
+    @DisplayName("calcularTotalGastos deve retornar o valor zero quando não houverem gastos registrados na viagem")
     void calcularTotalGastos_RetornaZero_QuandoNaoHouveremGastosRegistrados(){
         Viagem viagem = new Viagem();
 
@@ -27,7 +30,8 @@ class ViagemTest {
     }
 
     @Test
-    void calcularDiasDeViagem_RetornaInt_QuandoDiaDeChegadaETerminoDaViagemNaoSaoNull(){
+    @DisplayName("calcularDiasDeViagem deve retornar um inteiro com os didas de viagem quando o dia de chegada e termino da viagem não são null")
+    void calcularDiasDeViagem_RetornaDiasDeViagem_QuandoDiaDeChegadaETerminoDaViagemNaoSaoNull(){
         Viagem viagem = criarViagem1();
         int diasDeViagem = viagem.calcularDiasDeViagem();
 
@@ -35,7 +39,8 @@ class ViagemTest {
     }
 
     @Test
-    void calcularDiasDeViagem_RetornaZero_QuandoDiaDeChegadaOuTerminoForNull(){
+    @DisplayName("calcularDiasDeViagem deve retornar o valor zero quando dia da chega e/ou termino da viagem for null")
+    void calcularDiasDeViagem_RetornaZero_QuandoDiaDeChegadaEOuTerminoForNull(){
         Viagem viagem = new Viagem();
 
         int diasDeViagem = viagem.calcularDiasDeViagem();

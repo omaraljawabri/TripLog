@@ -6,6 +6,7 @@ import backend.main.exceptions.ValidacaoException;
 import backend.main.repositories.ViajanteRepository;
 import backend.main.services.AuthService;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -24,6 +25,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("cadastrar deve cadastrar um Viajante quando os dados do Viajante estiverem corretos")
     void cadastrar_CadastraViajante_QuandoDadosDoViajanteEstiveremCorretos(){
         ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
         AuthService authService = new AuthService(viajanteRepository);
@@ -34,7 +36,8 @@ class AuthServiceTest {
     }
 
     @Test
-    void cadastrar_LancaValidationException_QuandoNomeEmailOuSenhaForemNull(){
+    @DisplayName("cadastrar deve lançar uma ValidacaoException quando o nome, email ou senha forem null")
+    void cadastrar_LancaValidacaoException_QuandoNomeEmailOuSenhaForemNull(){
         ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
         AuthService authService = new AuthService(viajanteRepository);
 
@@ -45,6 +48,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("cadastrar deve lançar uma ErroInternoException quando algum erro interno ocorrer ao salvar um Viajante")
     void cadastrar_LancaErroInternoException_QuandoAlgumErroOcorreAoSalvarViajante(){
         ViajanteRepository viajanteRepository = new ViajanteRepository("/erro/"+NOME_ARQUIVO_VIAJANTE);
         AuthService authService = new AuthService(viajanteRepository);
@@ -56,7 +60,8 @@ class AuthServiceTest {
     }
 
     @Test
-    void cadastrar_LancaValidationException_QuandoOEmailInformadoParaCadastroJaExistirNoSistema(){
+    @DisplayName("cadastrar deve lançar uma ValidacaoException quando o email informado para cadastro do viajante já existir no sistema")
+    void cadastrar_LancaValidacaoException_QuandoOEmailInformadoParaCadastroJaExistirNoSistema(){
         ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
         AuthService authService = new AuthService(viajanteRepository);
 
@@ -70,6 +75,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("login deve retornar true quando o usuário tiver suas credenciais autenticadas com sucesso")
     void login_RetornaTrue_QuandoUsuarioEAutenticadoComSucesso(){
         ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
         AuthService authService = new AuthService(viajanteRepository);
@@ -84,7 +90,8 @@ class AuthServiceTest {
     }
 
     @Test
-    void login_LancaValidationException_QuandoEmailDoViajanteNaoExisteNoSistema(){
+    @DisplayName("login deve lançar uma ValidacaoException quando o email do viajante não existir no sistema")
+    void login_LancaValidacaoException_QuandoEmailDoViajanteNaoExisteNoSistema(){
         ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
         AuthService authService = new AuthService(viajanteRepository);
 
@@ -95,7 +102,8 @@ class AuthServiceTest {
     }
 
     @Test
-    void login_LancaValidationException_QuandoSenhaDoViajanteEstaIncorreta(){
+    @DisplayName("login deve lançar uma ValidacaoException quando a senha do viajante estiver incorreta")
+    void login_LancaValidacaoException_QuandoSenhaDoViajanteEstaIncorreta(){
         ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
         AuthService authService = new AuthService(viajanteRepository);
 

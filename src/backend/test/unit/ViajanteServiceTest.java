@@ -7,6 +7,7 @@ import backend.main.repositories.ViajanteRepository;
 import backend.main.services.ViajanteService;
 import backend.main.utils.SenhaUtil;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -25,6 +26,7 @@ class ViajanteServiceTest {
     }
 
     @Test
+    @DisplayName("editarViajante deve editar um viajante pelo email e não lançar nenhuma exception quando a edição for bem sucedida")
     void editarViajante_EditaViajantePeloEmailENaoLancaException_QuandoBemSucedido() {
         ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
         ViajanteService viajanteService = new ViajanteService(viajanteRepository);
@@ -37,6 +39,7 @@ class ViajanteServiceTest {
     }
 
     @Test
+    @DisplayName("editarViajante deve lançar uma EntidadeNaoEncontradaException quando não existir um viajante com o email passado como parâmetro")
     void editarViajante_LancaEntidadeNaoEncontradaException_QuandoNaoExistirViajanteComOEmailInformado(){
         ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
         ViajanteService viajanteService = new ViajanteService(viajanteRepository);
@@ -46,7 +49,8 @@ class ViajanteServiceTest {
     }
 
     @Test
-    void editarViajante_LancaValidaoException_QuandoSenhaAntigaInformadaNaoForAMesmaQueASenhaSalva(){
+    @DisplayName("editarViajante deve lançar uma ValidacaoException quando a senha antiga passada como parâmetro não for a mesma da senha salva no arquivo")
+    void editarViajante_LancaValidacaoException_QuandoSenhaAntigaInformadaNaoForAMesmaQueASenhaSalva(){
         ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
         ViajanteService viajanteService = new ViajanteService(viajanteRepository);
 
@@ -58,17 +62,33 @@ class ViajanteServiceTest {
         assertEquals("Senha atual digitada não é igual a senha salva", exception.getMessage());
     }
 
-    //Esse erro só conseguiria ser simulado utilizando mocks via Mockito ou algo do tipo, a situação para que ele ocorra não consegue ser feita apenas com JUnit 5
-    /*@Test
-    void editarViajante_LancaErroInternoException_QuandoAlgumErroOcorrerAoEditarViajante(){
+    @Test
+    @DisplayName("buscarMaiorId deve retornar o maior id de viajante quando houver viajantes cadastrados")
+    void buscarMaiorId_RetornaMaiorIdDeViajante_QuandoHouverViajanteCadastrado(){
         ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
-        ViajanteService viajanteService = new ViajanteService(new ViajanteRepository("erro/"+NOME_ARQUIVO_VIAJANTE));
+        ViajanteService viajanteService = new ViajanteService(viajanteRepository);
 
-        Viajante viajante = new Viajante("Fulano", SenhaUtil.hashSenha("fulano123"), "fulano@example.com");
+        Viajante.resetarContador();
 
+        Viajante viajante = new Viajante("Fulano", "fulano123", "fulano@example.com");
+        Viajante viajante2 = new Viajante("Fulano", "fulano123", "fulano@example.com");
+        Viajante viajante3 = new Viajante("Fulano", "fulano123", "fulano@example.com");
         viajanteRepository.salvarViajante(viajante);
+        viajanteRepository.salvarViajante(viajante2);
+        viajanteRepository.salvarViajante(viajante3);
 
-        ErroInternoException exception = assertThrows(ErroInternoException.class, () -> viajanteService.editarViajante("fulano@example.com", "Ciclano", "fulano123", "ciclano123"));
-        assertEquals("Erro ao editar viajante", exception.getMessage());
-    }*/
+        int maiorId = viajanteService.buscarMaiorId();
+        assertEquals(3, maiorId);
+    }
+
+    @Test
+    @DisplayName("buscarMaiorId deve retornar o valor zero quando não houver viajantes cadastrados")
+    void buscarMaiorId_RetornaZero_QuandoNaoHouverViajanteCadastrado(){
+        ViajanteRepository viajanteRepository = new ViajanteRepository(NOME_ARQUIVO_VIAJANTE);
+        ViajanteService viajanteService = new ViajanteService(viajanteRepository);
+
+        int maiorId = viajanteService.buscarMaiorId();
+
+        assertEquals(0, maiorId);
+    }
 }

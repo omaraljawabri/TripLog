@@ -3,11 +3,11 @@ package backend.test.unit;
 import backend.main.entities.*;
 import backend.main.exceptions.EntidadeNaoEncontradaException;
 import backend.main.exceptions.ErroInternoException;
-import backend.main.exceptions.SemResultadoException;
 import backend.main.exceptions.ValidacaoException;
 import backend.main.repositories.ViagemRepository;
 import backend.main.services.ViagemService;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -29,6 +29,7 @@ class ViagemServiceTest {
     }
 
     @Test
+    @DisplayName("adicionarViagem deve adicionar uma viagem ao arquivo quando a adição for bem sucedida")
     void adicionarViagem_AdicionaViagemAoArquivo_QuandoBemSucedido() {
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
         ViagemService viagemService = new ViagemService(viagemRepository);
@@ -46,7 +47,8 @@ class ViagemServiceTest {
     }
 
     @Test
-    void adicionarViagem_LancaValidationException_QuandoAtributosObrigatoriosNaoSaoPreenchidos(){
+    @DisplayName("adicionarViagem deve lançar uma ValidacaoException quando atributos obrigatorios nao forem preenchidos para adição da viagem")
+    void adicionarViagem_LancaValidacaoException_QuandoAtributosObrigatoriosNaoSaoPreenchidos(){
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
         ViagemService viagemService = new ViagemService(viagemRepository);
         Viagem viagem = criarViagem1();
@@ -59,6 +61,7 @@ class ViagemServiceTest {
     }
 
     @Test
+    @DisplayName("adicionarViagem deve lançar uma ErroInternoException quando algum erro interno ocorrer ao adicionar uma Viagem")
     void adicionarViagem_LancaErroInternoException_QuandoAlgumErroOcorreAoAdicionarViagem(){
         ViagemRepository viagemRepository = new ViagemRepository("erro/"+NOME_ARQUIVO_VIAGEM);
         ViagemService viagemService = new ViagemService(viagemRepository);
@@ -70,6 +73,7 @@ class ViagemServiceTest {
     }
 
     @Test
+    @DisplayName("listarViagens deve retornar uma Lista de Viagem quando houverem viagens registradas no sistema pertencentes ao viajante passado como parâmetro")
     void listarViagens_RetornaListaDeViagem_QuandoHouveremViagensRegistradas() {
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
         ViagemService viagemService = new ViagemService(viagemRepository);
@@ -89,6 +93,7 @@ class ViagemServiceTest {
     }
 
     @Test
+    @DisplayName("listarViagens deve retornar uma lista vazia quando não houverem viagens registradas pertencentes ao viajante passado como parâmetro")
     void listarViagens_RetornaListaVazia_QUandoNaoHouveremViagensRegistradas(){
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
         ViagemService viagemService = new ViagemService(viagemRepository);
@@ -99,6 +104,7 @@ class ViagemServiceTest {
     }
 
     @Test
+    @DisplayName("removerViagem deve remover uma viagem do arquivo quando o id da viagem passado existir")
     void removerViagem_RemoveViagem_QuandoIdDaViagemPassadoExistir() {
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
         ViagemService viagemService = new ViagemService(viagemRepository);
@@ -118,7 +124,8 @@ class ViagemServiceTest {
     }
 
     @Test
-    void removerViagem_LancaEntityNotFoundException_QuandoIdDaViagemPassadoNaoExistir(){
+    @DisplayName("removerViagem deve lançar uma EntidadeNaoEncontradaException quando o id da viagem passado não existir")
+    void removerViagem_LancaEntidadeNaoEncontradaException_QuandoIdDaViagemPassadoNaoExistir(){
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
         ViagemService viagemService = new ViagemService(viagemRepository);
 
@@ -130,6 +137,7 @@ class ViagemServiceTest {
     }
 
     @Test
+    @DisplayName("editarViagem deve editar a viagem com o id passado quando o id da viagem passado existir")
     void editarViagem_EditaViagemComIdPassado_QuandoIdPassadoExistir() {
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
         ViagemService viagemService = new ViagemService(viagemRepository);
@@ -151,7 +159,8 @@ class ViagemServiceTest {
     }
 
     @Test
-    void editarViagem_LancaEntityNotFoundException_QuandoIdPassadoNaoExistir(){
+    @DisplayName("editarViagem deve lançar uma EntidadeNaoEncontradaException quando não existir viagem com o id passado")
+    void editarViagem_LancaEntidadeNaoEncontradaException_QuandoIdPassadoNaoExistir(){
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
         ViagemService viagemService = new ViagemService(viagemRepository);
 
@@ -163,6 +172,7 @@ class ViagemServiceTest {
     }
 
     @Test
+    @DisplayName("buscarViagensFiltradas deve retornar uma lista de viagem com dados quando houverem viagens com o destino aplicado")
     void buscarViagensFiltradas_RetornaListaDeViagemPopulada_QuandoHouveremViagensComDestinoAplicado(){
         Viagem viagem = criarViagem1();
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
@@ -179,6 +189,7 @@ class ViagemServiceTest {
     }
 
     @Test
+    @DisplayName("buscarViagensFiltradas deve retornar uma lista de viagem com dados quando houverem viagens com a companhia aplicada")
     void buscarViagensFiltradas_RetornaListaDeViagemPopulada_QuandoHouveremViagensComCompanhiaAplicada(){
         Viagem viagem = criarViagem1();
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
@@ -195,6 +206,7 @@ class ViagemServiceTest {
     }
 
     @Test
+    @DisplayName("buscarViagensFiltradas deve retornar uma lista de viagem com dados quando houverem viagens com o gasto superior ao aplicado")
     void buscarViagensFiltradas_RetornaListaDeViagemPopulada_QuandoHouverViagensComGastoSuperiorAoAplicado(){
         Viagem viagem = criarViagem1();
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
@@ -213,6 +225,7 @@ class ViagemServiceTest {
     }
 
     @Test
+    @DisplayName("buscarViagensFiltradas deve retornar uma lista de viagem vazia quando não houver viagens com o destino aplicado")
     void buscarViagensFiltradas_RetornaListaDeViagemVazia_QuandoNaoHouveremViagensComDestinoAplicado(){
         Viagem viagem = criarViagem1();
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
@@ -225,6 +238,7 @@ class ViagemServiceTest {
     }
 
     @Test
+    @DisplayName("buscarViagensFiltradas deve retornar uma lista de viagem vazia quando não houver viagens com a companhia aplicada")
     void buscarViagensFiltradas_RetornaListaDeViagemVazia_QuandoNaoHouveremViagensComCompanhiaAplicada(){
         Viagem viagem = criarViagem1();
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
@@ -237,6 +251,7 @@ class ViagemServiceTest {
     }
 
     @Test
+    @DisplayName("buscarViagensFiltradas deve retornar uma lista de viagem vazia quando não houver viagens com o gasto superior ao aplicado")
     void buscarViagensFiltradas_RetornaListaDeViagemVazia_QuandoNaoHouverViagensComGastoSuperiorAoAplicado(){
         Viagem viagem = criarViagem1();
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
@@ -249,6 +264,7 @@ class ViagemServiceTest {
     }
 
     @Test
+    @DisplayName("buscarViagensFiltradas deve retornar uma lista de viagem com dados quando houver viagens com destino e companhia aplicados")
     void buscarViagensFiltradas_RetornaListaDeViagemPopulada_QuandoHouverViagensComDestinoECompanhiaAplicados(){
         Viagem viagem = criarViagem1();
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
@@ -266,6 +282,7 @@ class ViagemServiceTest {
     }
 
     @Test
+    @DisplayName("buscarViagensFiltradas deve retornar uma lista de viagem com dados quando houver viagens com destino, companhia aplicados e gasto superior ao aplicado")
     void buscarViagensFiltradas_RetornaListaDeViagemPopulada_QuandoHouverViagensComDestinoCompanhiaEGastoAplicados(){
         Viagem viagem = criarViagem1();
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
@@ -285,6 +302,8 @@ class ViagemServiceTest {
         assertTrue(viagens.getFirst().calcularTotalGastos() > gasto);
     }
 
+    @Test
+    @DisplayName("buscarTodasViagensPorEmailViajante deve retornar uma lista de viagem quando houver viajens com o email do viajante passado")
     void buscarTodasViagensPorEmailViajante_RetornaListaDeViagem_QuandoHouverViagensComEmailViajantePassado(){
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
         ViagemService viagemService = new ViagemService(viagemRepository);
@@ -300,12 +319,42 @@ class ViagemServiceTest {
         assertEquals(2, viagens.size());
     }
 
+    @Test
+    @DisplayName("buscarTodasViagensPorEmailViajante deve retornar uma lista vazia quando não houver viagens com o email do viajante passado")
     void buscarTodasViagensPorEmailViajante_RetornaListaVazia_QuandoNaoHouverViagensComEmailViajantePassado(){
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
         ViagemService viagemService = new ViagemService(viagemRepository);
 
         List<Viagem> viagens = viagemService.buscarTodasViagensPorEmailViajante("fulano@example.com");
         assertTrue(viagens.isEmpty());
+    }
+
+    @Test
+    @DisplayName("buscarMaiorIdPorEmailViajante deve retornar o maior id da viagem quando houver viagens cadastradas com email do viajante passado")
+    void buscarMaiorIdPorEmailViajante_RetornaMaiorIdDaViagem_QuandoHouverViagemCadastrada(){
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViagemService viagemService = new ViagemService(viagemRepository);
+
+        Viagem.resetarContador();
+
+        viagemRepository.salvarViagem(criarViagem1());
+        viagemRepository.salvarViagem(criarViagem2());
+        viagemRepository.salvarViagem(criarViagem3());
+
+        int maiorId = viagemService.buscarMaiorIdPorEmailViajante("fulano@example.com");
+
+        assertEquals(3, maiorId);
+    }
+
+    @Test
+    @DisplayName("buscarMaiorIdPorEmailViajante deve retornar o valor zero quando não houver viagem cadastrada com o email do viajante passado")
+    void buscarMaiorIdPorEmailViajante_RetornaZero_QuandoNaoHouverViagemCadastrada(){
+        ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO_VIAGEM);
+        ViagemService viagemService = new ViagemService(viagemRepository);
+
+        int maiorId = viagemService.buscarMaiorIdPorEmailViajante("fulano@example.com");
+
+        assertEquals(0, maiorId);
     }
 
     private Viagem criarViagem1(){
