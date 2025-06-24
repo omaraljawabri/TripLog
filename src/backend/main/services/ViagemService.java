@@ -4,7 +4,6 @@ import backend.main.entities.Viagem;
 import backend.main.entities.Viajante;
 import backend.main.exceptions.EntidadeNaoEncontradaException;
 import backend.main.exceptions.ErroInternoException;
-import backend.main.exceptions.SemResultadoException;
 import backend.main.exceptions.ValidacaoException;
 import backend.main.repositories.ViagemRepository;
 
