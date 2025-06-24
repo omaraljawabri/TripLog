@@ -33,4 +33,8 @@ public class ViajanteService {
             throw new ErroInternoException("Erro ao editar viajante");
         }
     }
+
+    public int buscarMaiorId(){
+        return viajanteRepository.buscarMaiorId();
+    }
 }

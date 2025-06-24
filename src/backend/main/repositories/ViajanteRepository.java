@@ -61,6 +61,19 @@ public class ViajanteRepository {
         return viajante.getFirst();
     }
 
+    public int buscarMaiorId(){
+        List<Viajante> viajantes = buscarTodosViajantes();
+        int maiorId = 0;
+
+        for (Viajante viajante : viajantes){
+            if (viajante.getId() > maiorId){
+                maiorId = viajante.getId();
+            }
+        }
+
+        return maiorId;
+    }
+
     private List<Viajante> buscarTodosViajantes(){
         Path path = Paths.get(caminhoArquivo);
         if (!Files.exists(path)){
