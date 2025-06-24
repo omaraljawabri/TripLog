@@ -92,7 +92,7 @@ public class ListaDeViagensFrame {
         footerPanel.add(btnAdicionarViagem);
 
         styleSecondaryButton(btnAtualizarLista);
-        btnAtualizarLista.setPreferredSize(new Dimension(140, 36));
+        btnAtualizarLista.setVisible(false);
         btnAtualizarLista.addActionListener(e -> atualizarLista());
         footerPanel.add(btnAtualizarLista);
 
@@ -140,13 +140,13 @@ public class ListaDeViagensFrame {
         styleField(txtFiltroDestino);
         filtros.add(txtFiltroDestino);
 
-        filtros.add(new JLabel("Saldo mín.:"));
-        styleField(txtFiltroSaldoMin);
-        filtros.add(txtFiltroSaldoMin);
-
         filtros.add(new JLabel("Companhia:"));
         styleField(txtFiltroCompanhia);
         filtros.add(txtFiltroCompanhia);
+
+        filtros.add(new JLabel("Saldo mín.:"));
+        styleField(txtFiltroSaldoMin);
+        filtros.add(txtFiltroSaldoMin);
 
         stylePrimaryButton(btnFiltrar);
         btnFiltrar.setPreferredSize(new Dimension(130, 38));

@@ -114,23 +114,29 @@ public class MainFrame extends JFrame {
     }
 
     public void abrirListaDeViagens() {
+        if (listaDeViagensFrame != null) {
+            cardPanel.remove(listaDeViagensFrame.getPanel());
+        }
+
         listaDeViagensFrame = new ListaDeViagensFrame(
-                usuarioLogado,                          // Viajante
-                usuarioLogado.getViagens(),            // Lista de viagens dele
+                usuarioLogado,
+                usuarioLogado.getViagens(),
                 viagem -> JOptionPane.showMessageDialog(this, "Abrindo detalhes de: " + viagem.getLugarDeChegada()),
                 viagem -> {
                     JOptionPane.showMessageDialog(this, "Viagem para " + viagem.getLugarDeChegada() + " excluída!");
                     usuarioLogado.getViagens().remove(viagem);
-                    listaDeViagensFrame.atualizarListaPublic(); // Atualiza após remoção
+                    listaDeViagensFrame.atualizarListaPublic();
                 },
                 e -> abrirPerfil(usuarioLogado),
                 e -> abrirCadastroViagem()
         );
 
-        setContentPane(listaDeViagensFrame.getPanel());
+        cardPanel.add(listaDeViagensFrame.getPanel(), "listaViagens");
+        cardLayout.show(cardPanel, "listaViagens");
         revalidate();
         repaint();
     }
+
 
 
     private void voltarParaHomeOuLogin() {
