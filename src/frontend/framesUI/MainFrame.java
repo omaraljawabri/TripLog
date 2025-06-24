@@ -1,6 +1,8 @@
 package frontend.framesUI;
 
 import backend.main.entities.Viajante;
+import backend.main.repositories.ViagemRepository;
+import backend.main.services.ViagemService;
 import com.formdev.flatlaf.FlatLightLaf;
 
 import javax.swing.*;
@@ -99,12 +101,29 @@ public class MainFrame extends JFrame {
         perfil = new ProfileUserFrame(viajante);
 
         perfil.setBtnInicioListener(() -> abrirHome(usuarioLogado));
-        perfil.getBtnListaViagens().addActionListener(e -> abrirListaDeViagens());
         perfil.getBtnLogout().addActionListener(e -> {
             JOptionPane.showMessageDialog(this, "Logout efetuado!");
             usuarioLogado = null;
             cardLayout.show(cardPanel, "login");
         });
+
+        ViagemService viagemService = new ViagemService(new ViagemRepository("viagem.ser"));
+        List<backend.main.entities.Viagem> viagensBack = viagemService.buscarTodasViagensPorEmailViajante(this.usuarioLogado.getEmail());
+
+        List<ListaDeViagensFrame.Viagem> viagensFront = viagensBack.stream()
+                .map(MainFrame::converterParaFrontend)
+                .toList();
+
+        // ✅ Atualize a lista global para usar depois
+        this.viagens.clear();
+        this.viagens.addAll(viagensFront);
+
+        perfil.setBtnListaViagensListener(
+                this,
+                viagensFront,
+                () -> abrirPerfil(usuarioLogado),
+                this::abrirCadastroViagem
+        );
 
         cardPanel.add(perfil.getPanel(), "perfil");
         cardLayout.show(cardPanel, "perfil");
@@ -112,13 +131,39 @@ public class MainFrame extends JFrame {
         repaint();
     }
 
+    public static ListaDeViagensFrame.Viagem converterParaFrontend(backend.main.entities.Viagem v) {
+        return new ListaDeViagensFrame.Viagem(
+                v.getLugarDeChegada(),
+                v.calcularDiasDeViagem(),
+                v.calcularTotalGastos()
+        );
+    }
+
     public void abrirListaDeViagens() {
+        if (usuarioLogado == null) {
+            JOptionPane.showMessageDialog(this, "Usuário não está logado.");
+            return;
+        }
+
+        ViagemService viagemService = new ViagemService(new ViagemRepository("viagem.ser"));
+        List<backend.main.entities.Viagem> viagensBack = viagemService.buscarTodasViagensPorEmailViajante(usuarioLogado.getEmail());
+
+        List<ListaDeViagensFrame.Viagem> viagensFront = viagensBack.stream()
+                .map(MainFrame::converterParaFrontend)
+                .toList();
+
+        // Atualize a lista global para usar depois
+        this.viagens.clear();
+        this.viagens.addAll(viagensFront);
+
         listaDeViagensFrame = new ListaDeViagensFrame(
-                viagens,
+                viagensFront,
                 viagem -> JOptionPane.showMessageDialog(this, "Abrindo detalhes de: " + viagem.getLugarChegada()),
                 viagem -> {
                     JOptionPane.showMessageDialog(this, "Viagem para " + viagem.getLugarChegada() + " excluída!");
                     viagens.remove(viagem);
+                    // Você pode adicionar aqui lógica para excluir da base, se quiser
+                    listaDeViagensFrame.atualizarListaPublic(); // se esse método existir para atualizar a lista visual
                 },
                 e -> abrirPerfil(usuarioLogado),
                 e -> abrirCadastroViagem()
@@ -129,6 +174,7 @@ public class MainFrame extends JFrame {
         revalidate();
         repaint();
     }
+
 
     private void voltarParaHomeOuLogin() {
         if (usuarioLogado != null) {

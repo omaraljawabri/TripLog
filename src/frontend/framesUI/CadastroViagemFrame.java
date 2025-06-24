@@ -224,8 +224,8 @@ public class CadastroViagemFrame {
         addLabel(panel, gbc, 1, 2, "Data de Chegada");
         addLabel(panel, gbc, 2, 2, "Companhia");
 
-        inputDataSaida    = addMaskedDateField(panel, gbc, 0, 3);
-        inputDataChegada  = addMaskedDateField(panel, gbc, 1, 3);
+        inputDataChegada    = addMaskedDateField(panel, gbc, 0, 3);
+        inputDataSaida  = addMaskedDateField(panel, gbc, 1, 3);
         inputCompanhia    = addField(panel, gbc, 2, 3);
 
         return panel;

@@ -265,6 +265,7 @@ public class ProfileUserFrame {
     public void setBtnInicioListener(Runnable callback){
         btnInicio.addActionListener(e -> callback.run());
     }
+
     public void setBtnListaViagensListener(JFrame framePai,
                                            List<ListaDeViagensFrame.Viagem> viagens,
                                            Runnable abrirPerfilCallback,

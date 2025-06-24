@@ -62,7 +62,7 @@ public class ViagemService {
     }
 
     public List<Viagem> buscarTodasViagensPorEmailViajante(String emailViajante){
-        return buscarTodasViagensPorEmailViajante(emailViajante);
+        return viagemRepository.buscarViagensPorEmailViajante(emailViajante);
     }
 
     public void removerViagem(int id, Viajante viajante){
