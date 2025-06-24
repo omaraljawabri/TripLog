@@ -68,15 +68,6 @@ public class ViagemRepository {
         }
     }
 
-    public Viagem buscarViagemPorId(int id, String emailViajante){
-        List<Viagem> viagens = buscarViagensPorEmailViajante(emailViajante);
-        List<Viagem> viagem = viagens.stream().filter(v -> v.getId() == id).toList();
-        if (viagem.isEmpty()){
-            return null;
-        }
-        return viagem.getFirst();
-    }
-
     public List<Viagem> buscarViagensFiltradas(String emailViajante, String destino, String companhia, Double gasto){
         List<Viagem> viagens = buscarViagensPorEmailViajante(emailViajante);
 

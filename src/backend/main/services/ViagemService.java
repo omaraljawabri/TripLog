@@ -45,14 +45,6 @@ public class ViagemService {
         return viagensListadas;
     }
 
-    public Viagem buscarViagemPorId(int id, Viajante viajante){
-        Viagem viagem = viagemRepository.buscarViagemPorId(id, viajante.getEmail());
-        if (viagem == null){
-            throw new EntidadeNaoEncontradaException("Viagem com id: "+id+", não encontrada!");
-        }
-        return viagem;
-    }
-
     public List<Viagem> buscarViagensFiltradas(String emailViajante, String destino, String companhia, Double gasto){
         return viagemRepository.buscarViagensFiltradas(emailViajante, destino, companhia, gasto);
     }
