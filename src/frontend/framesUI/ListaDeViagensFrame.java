@@ -221,33 +221,7 @@ public class ListaDeViagensFrame {
         btnDetalhes.setPreferredSize(new Dimension(130, 32));
 
         btnDetalhes.addActionListener(e -> {
-            DetalhesViagemFrame detalhesFrame = new DetalhesViagemFrame(viajante);
-
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            String dataChegadaStr = v.getDataChegada() != null ? v.getDataChegada().format(formatter) : "";
-            String dataTerminoStr = v.getDataTermino() != null ? v.getDataTermino().format(formatter) : "";
-
-            detalhesFrame.carregarDadosViagem(
-                    v.getId(),
-                    v.getLugarDePartida(),
-                    v.getLugarDeChegada(),
-                    String.format("R$ %.2f", v.getSaldo()),
-                    String.format("R$ %.2f", v.calcularTotalGastos()),
-                    dataChegadaStr,
-                    dataTerminoStr,
-                    String.valueOf(v.calcularDiasDeViagem()),
-                    v.getCompanhia(),
-                    getHospedagensAsDados(v.getHospedagens()),
-                    getAtividadesAsDados(v.getAtividades()),
-                    getDeslocamentosAsDados(v.getDeslocamentos())
-            );
-
-            // Obtém o JFrame que contém o botão
-            JFrame mainFrame = (JFrame) SwingUtilities.getWindowAncestor((Component) e.getSource());
-            // Troca o conteúdo da janela para a tela de detalhes
-            mainFrame.setContentPane(detalhesFrame.getPanel());
-            mainFrame.revalidate();
-            mainFrame.repaint();
+            onVerDetalhes.accept(v);
         });
 
 
