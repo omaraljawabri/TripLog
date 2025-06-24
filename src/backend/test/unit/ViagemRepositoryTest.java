@@ -285,27 +285,28 @@ class ViagemRepositoryTest {
     }
 
     @Test
-    @DisplayName("buscarMaiorIdPorEmailViajante deve retornar o maior id cadastrado da classe Viagem quando houver viagens cadastradas para o viajante com email passado")
-    void buscarMaiorIdPorEmailViajante_RetornaMaiorIdDaViagem_QuandoHouverViagemCadastrada(){
+    @DisplayName("buscarMaiorId deve retornar o maior id cadastrado da classe Viagem quando houver viagens cadastradas")
+    void buscarMaiorId_RetornaMaiorIdDaViagem_QuandoHouverViagemCadastrada(){
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO);
 
         Viagem.resetarContador();
 
         viagemRepository.salvarViagem(criarViagem1());
         viagemRepository.salvarViagem(criarViagem2());
-        viagemRepository.salvarViagem(criarViagem3());
+        Viagem viagem = criarViagem3();
+        viagemRepository.salvarViagem(viagem);
 
-        int maiorId = viagemRepository.buscarMaiorIdPorEmailViajante("fulano@example.com");
+        int maiorId = viagemRepository.buscarMaiorId();
 
-        assertEquals(3, maiorId);
+        assertEquals(viagem.getId(), maiorId);
     }
 
     @Test
-    @DisplayName("buscarMaiorIdPorEmailViajante deve retornar o valor zero quando não houver viagens cadastradas para o viajante com email passado")
-    void buscarMaiorIdPorEmailViajante_RetornaZero_QuandoNaoHouverViagemCadastrada(){
+    @DisplayName("buscarMaiorId deve retornar o valor zero quando não houver viagens cadastradas")
+    void buscarMaiorId_RetornaZero_QuandoNaoHouverViagemCadastrada(){
         ViagemRepository viagemRepository = new ViagemRepository(NOME_ARQUIVO);
 
-        int maiorId = viagemRepository.buscarMaiorIdPorEmailViajante("fulano@example.com");
+        int maiorId = viagemRepository.buscarMaiorId();
 
         assertEquals(0, maiorId);
     }

@@ -43,7 +43,7 @@ public class Viagem implements Serializable {
         if (Viagem.contador == 0){
             ViagemRepository viagemRepository = new ViagemRepository("viagem.ser");
             ViagemService viagemService = new ViagemService(viagemRepository);
-            Viagem.contador = viagemService.buscarMaiorIdPorEmailViajante(this.emailViajante);
+            Viagem.contador = viagemService.buscarMaiorId();
         }
         Viagem.contador++;
         this.id = Viagem.contador;
@@ -68,7 +68,7 @@ public class Viagem implements Serializable {
         if (Viagem.contador == 0){
             ViagemRepository viagemRepository = new ViagemRepository("viagem.ser");
             ViagemService viagemService = new ViagemService(viagemRepository);
-            Viagem.contador = viagemService.buscarMaiorIdPorEmailViajante(this.emailViajante);
+            Viagem.contador = viagemService.buscarMaiorId();
         }
         Viagem.contador++;
         this.id = Viagem.contador;
