@@ -51,8 +51,7 @@ public class HomeFrame {
         /* ---------- Imagem (topo) ---------- */
         Image img;
         try {
-            ImageIcon ico = new ImageIcon(getClass().getResource(
-                    "../resources/images/planeLogo.png"));
+            ImageIcon ico = new ImageIcon(getClass().getResource("/images/planeLogo.png"));
             img = ico.getImage();
         } catch (Exception e) {
             // Se falhar, cria um retângulo placeholder

@@ -36,7 +36,7 @@ public class ProfileUserFrame {
         topPanel.setBorder(BorderFactory.createEmptyBorder(30, 0, 20, 0));
 
         try {
-            ImageIcon ico   = new ImageIcon(getClass().getResource("../resources/images/ProfileIcon.png"));
+            ImageIcon ico = new ImageIcon(getClass().getResource("/images/ProfileIcon.png"));
             Image     scaled= ico.getImage().getScaledInstance(140, 140, Image.SCALE_SMOOTH);
             JLabel imgLabel = new JLabel(new ImageIcon(scaled));
             imgLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
