@@ -80,6 +80,7 @@ public class MainFrame extends JFrame {
 
             cadastroViagem = new CadastroViagemFrame(usuarioLogado);
             cadastroViagem.addCancelarListener(e -> voltarParaHomeOuLogin());
+            cadastroViagem.addSalvarComSucessoListener(e -> abrirListaDeViagens());
 
             cardPanel.add(cadastroViagem.getPanel(), "cadastroViagem");
             revalidate();
@@ -117,6 +118,7 @@ public class MainFrame extends JFrame {
         if (listaDeViagensFrame != null) {
             cardPanel.remove(listaDeViagensFrame.getPanel());
         }
+
 
         listaDeViagensFrame = new ListaDeViagensFrame(
                 usuarioLogado,

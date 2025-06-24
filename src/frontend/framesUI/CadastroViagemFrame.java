@@ -7,6 +7,7 @@ import backend.main.services.ViagemService;
 import javax.swing.*;
 import javax.swing.text.MaskFormatter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -40,8 +41,14 @@ public class CadastroViagemFrame {
     private JButton btnSalvar;
     private JButton btnCancelar;
 
+    private ActionListener salvarComSucessoListener;
+
     public void addCancelarListener(ActionListener listener) {
         btnCancelar.addActionListener(listener);
+    }
+
+    public void addSalvarComSucessoListener(ActionListener listener) {
+        this.salvarComSucessoListener = listener;
     }
 
     /* ==================================================== */
@@ -144,6 +151,11 @@ public class CadastroViagemFrame {
                     ViagemService viagemService = new ViagemService(viagemRepository);
                     viagemService.adicionarViagem(viagem, viajante);
                     JOptionPane.showMessageDialog(mainPanel, "Viagem cadastrada com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                    if (salvarComSucessoListener != null) {
+                        salvarComSucessoListener.actionPerformed(
+                                new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "salvar_sucesso")
+                        );
+                    }
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(mainPanel, "Erro ao fazer cadastro de viagem! Credenciais inválidas, tente novamente!", "Erro", JOptionPane.ERROR_MESSAGE);
                 }
