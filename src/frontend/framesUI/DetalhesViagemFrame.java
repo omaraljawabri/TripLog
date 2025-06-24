@@ -196,7 +196,7 @@ public class DetalhesViagemFrame {
         topPanel.setBackground(Color.WHITE);
 
         try {
-            ImageIcon img = new ImageIcon(getClass().getResource("../resources/images/beachIcon.png"));
+            ImageIcon img = new ImageIcon(getClass().getResource("/images/beachIcon.png"));
             Image scaled = img.getImage().getScaledInstance(120, -1, Image.SCALE_SMOOTH);
             JLabel imagemLabel = new JLabel(new ImageIcon(scaled));
             imagemLabel.setAlignmentX(Component.CENTER_ALIGNMENT);

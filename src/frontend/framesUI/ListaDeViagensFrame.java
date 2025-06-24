@@ -113,7 +113,7 @@ public class ListaDeViagensFrame {
         topPanel.setBackground(Color.WHITE);
 
         try {
-            ImageIcon icon = new ImageIcon(getClass().getResource("../resources/images/beachIcon.png"));
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/beachIcon.png"));
             Image scaled = icon.getImage().getScaledInstance(120, -1, Image.SCALE_SMOOTH);
             JLabel imgLbl = new JLabel(new ImageIcon(scaled));
             imgLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
