@@ -1,0 +1,7 @@
+backend.main.entities
+backend.main.exceptions
+backend.main.repositories
+backend.main.services
+backend.main.utils
+backend.test.unit
+frontend.framesUI
