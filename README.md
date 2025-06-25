@@ -70,6 +70,8 @@ TripLog/
 │   │   ├── framesUI/           # Telas Swing (JFrames)
 │   │   └── resources.images/   # Imagens e ícones da interface
 │   └── test.unit/              # Testes unitários
+├── javadoc                     # Diretório que contém a documentação Javadoc do projeto
+├── TripLog.jar                 # Arquivo .jar
 ├── viagem.ser                  # Arquivo de dados serializados de viagens (gerado ao criar viagens)
 ├── viajante.ser                # Arquivo de dados serializados de usuários (gerado ao criar usuários)
 └── README.md
