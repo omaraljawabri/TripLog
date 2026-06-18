@@ -17,7 +17,7 @@ branch `main`, já publicada em `origin/main`:
 | Primeiro commit | `0634ffd` — "Init commit" (05/06/2025) |
 | Commit mais recente da baseline | `cd32488` — "fix(frame): corrigir erro exibido ao não preenchimento de dados obrigatório" |
 | Contribuintes | Omar Al Jawabri, Hugo Pereira Borges, Stephano Soares Viglio |
-| Versão candidata à release | `v1.0.0-rc1` (ainda sem tag formal no Git — sugestão ao final do relatório) |
+| Versão candidata à release | `v1.0.0-rc1` (tag anotada no commit `cd32488`) |
 | Ferramenta de inventário | Syft v1.45.1 |
 | Formato do inventário | CycloneDX 1.6 (JSON) |
 | Arquivo gerado | `sbom-v1.0.0-rc1.json` |
@@ -109,11 +109,5 @@ está documentado. O resultado foi **aprovado, com uma ressalva**:
 
 - Remover os `.jar` antigos (`TripLog.jar` e a pasta `out/`) do controle de versão e, se for
   necessário disponibilizar o executável, publicá-lo como anexo de uma release no GitHub.
-- Quando o grupo decidir formalizar essa versão como release, criar uma tag anotada no commit
-  `cd32488`, por exemplo:
-  ```
-  git tag -a v1.0.0-rc1 -m "Release candidate 1: build Maven, FlatLaf versionado, correção de erro no cadastro de viagem"
-  git push origin v1.0.0-rc1
-  ```
 - Repetir a geração do inventário (Syft) a cada nova release e guardar o JSON junto da tag
   correspondente, para que auditorias futuras não dependam de execução manual.
