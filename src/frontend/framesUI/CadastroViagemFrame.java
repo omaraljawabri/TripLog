@@ -1,6 +1,8 @@
 package frontend.framesUI;
 
 import backend.main.entities.*;
+import backend.main.exceptions.ErroInternoException;
+import backend.main.exceptions.ValidacaoException;
 import backend.main.repositories.ViagemRepository;
 import backend.main.services.ViagemService;
 
@@ -13,6 +15,7 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -156,8 +159,14 @@ public class CadastroViagemFrame {
                                 new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "salvar_sucesso")
                         );
                     }
+                } catch (ValidacaoException | ErroInternoException ex) {
+                    JOptionPane.showMessageDialog(mainPanel, ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(mainPanel, "Erro ao fazer cadastro de viagem! Verifique se saldo, custos, noites e valores de diária foram preenchidos corretamente (use ponto como separador decimal).", "Erro", JOptionPane.ERROR_MESSAGE);
+                } catch (DateTimeParseException ex) {
+                    JOptionPane.showMessageDialog(mainPanel, "Erro ao fazer cadastro de viagem! Verifique se as datas foram preenchidas no formato dd/MM/yyyy.", "Erro", JOptionPane.ERROR_MESSAGE);
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(mainPanel, "Erro ao fazer cadastro de viagem! Credenciais inválidas, tente novamente!", "Erro", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(mainPanel, "Erro ao fazer cadastro de viagem! Tente novamente.", "Erro", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
