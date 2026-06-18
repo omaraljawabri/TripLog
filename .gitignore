@@ -31,3 +31,7 @@ bin/
 /.idea
 viagem.ser
 viajante.ser
+
+### Maven ###
+target/
+dependency-reduced-pom.xml
