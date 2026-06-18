@@ -8,8 +8,8 @@
 
 | Item | Valor |
 |---|---|
-| Produto | TripLog (trabalho-final-poo) |
-| Repositório | github.com/omaraljawabri/trabalho-final-poo |
+| Produto | TripLog |
+| Repositório | github.com/omaraljawabri/TripLog |
 | Branch | `main` |
 | Identificador da baseline (tag) | `v1.0.0-rc1` |
 | Commit apontado pela tag | `cd32488cdd42080160fb7b8b7e61496982e72931` |
