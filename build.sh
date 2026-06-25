@@ -54,7 +54,7 @@ build.sh — build completo e reprodutível do TripLog
 
 Reproduz, a partir de um ambiente limpo, em um único comando:
   1. Validação das ferramentas necessárias e de suas versões mínimas
-     (JDK ${MIN_JAVA_VERSION}+, Maven ${MIN_MVN_VERSION}+, unzip)
+     (JDK ${MIN_JAVA_VERSION}+, Maven ${MIN_MVN_VERSION}+)
   2. Limpeza de artefatos de builds anteriores (target/, dependency-reduced-pom.xml)
   3. Âncora de determinismo: SOURCE_DATE_EPOCH derivado do último commit,
      TZ=UTC, LC_ALL=C e project.build.outputTimestamp do Maven — o mesmo
@@ -83,11 +83,8 @@ fi
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
-# Remove códigos de escape ANSI (saída de `mvn -version` pode trazer cores
-# mesmo fora de um terminal interativo)
 strip_ansi() { sed -E 's/\x1b\[[0-9;]*[a-zA-Z]//g'; }
 
-# sha256sum no Linux, shasum -a 256 no macOS — só o número do hash
 sha256_of() {
     if have sha256sum; then sha256sum "$1" | awk '{print $1}'
     elif have shasum;   then shasum -a 256 "$1" | awk '{print $1}'
@@ -95,8 +92,6 @@ sha256_of() {
     fi
 }
 
-# Verifica um arquivo de hashes (formato "<hash>  <caminho>") com a
-# ferramenta disponível — mesmo fallback usado em sha256_of
 sha256_check() {
     if have sha256sum; then sha256sum -c "$1"
     elif have shasum;   then shasum -a 256 -c "$1"
@@ -104,7 +99,6 @@ sha256_check() {
     fi
 }
 
-# Escapa \ e " para uso em valores de string dentro do build-info.json
 json_str() { printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'; }
 
 git_field() {
@@ -113,8 +107,6 @@ git_field() {
     fi
 }
 
-# Compara duas versões "X.Y.Z" (faltando componentes contam como 0).
-# Retorna sucesso (0) se a primeira for >= a segunda.
 version_ge() {
     local IFS=.
     local -a a=($1) b=($2)
@@ -130,7 +122,7 @@ version_ge() {
 step "Verificando ferramentas necessárias"
 command -v java   >/dev/null 2>&1 || fail "java não encontrado no PATH. Instale o JDK ${MIN_JAVA_VERSION}+."
 command -v mvn    >/dev/null 2>&1 || fail "mvn não encontrado no PATH. Instale o Maven ${MIN_MVN_VERSION}+."
-command -v unzip  >/dev/null 2>&1 || fail "unzip não encontrado no PATH. Necessário para inspecionar o .jar gerado."
+command -v jar    >/dev/null 2>&1 || fail "jar não encontrado no PATH (faz parte do JDK). Verifique a instalação do JDK ${MIN_JAVA_VERSION}+."
 
 JAVA_VERSION="$(java -version 2>&1 | head -n1 | strip_ansi)"
 MVN_VERSION="$(mvn -version 2>&1 | head -n1 | strip_ansi)"
@@ -193,9 +185,6 @@ step "Compilando, executando testes e empacotando (mvn clean package)"
 mvn -B clean package "-Dproject.build.outputTimestamp=${BUILD_TS}"
 ok "build Maven concluído com sucesso"
 
-# Descobre o .jar final empacotado pelo maven-shade-plugin sem fixar a
-# versão no script: o nome muda a cada bump de versão no pom.xml, e o
-# shade plugin preserva o artefato pré-shade como "original-*.jar".
 JAR_PATH=""
 while IFS= read -r f; do JAR_PATH="$f"; break; done < <(
     find target -maxdepth 1 -name '*.jar' ! -name 'original-*' 2>/dev/null | sort
@@ -257,11 +246,14 @@ step "Verificando integridade do build"
 sha256_check "$HASHES_OUT" >/dev/null || fail "hashes não correspondem aos arquivos gerados"
 ok "hashes verificados"
 
-MAIN_CLASS=$(unzip -p "$JAR_PATH" META-INF/MANIFEST.MF | tr -d '\r' | grep '^Main-Class:' || true)
+MANIFEST_DIR="$(mktemp -d)"
+( cd "$MANIFEST_DIR" && jar --extract --file="$ROOT_DIR/$JAR_PATH" META-INF/MANIFEST.MF )
+MAIN_CLASS=$(tr -d '\r' < "$MANIFEST_DIR/META-INF/MANIFEST.MF" | grep '^Main-Class:' || true)
+rm -rf "$MANIFEST_DIR"
 [ -n "$MAIN_CLASS" ] || fail "manifest do .jar não contém Main-Class"
 ok "manifest: ${MAIN_CLASS}"
 
-if unzip -l "$JAR_PATH" | grep -qi '/test/'; then
+if jar tf "$JAR_PATH" | grep -qi '/test/'; then
     fail "o .jar final contém classes de teste — verifique a configuração do maven-shade-plugin"
 fi
 ok "nenhuma classe de teste embarcada no .jar final"
