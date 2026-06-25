@@ -1,0 +1,85 @@
+{
+  "meta": {
+    "project": "com.triplog:TripLog:1.0.0",
+    "generatedAt": "2026-06-24T22:17:25-03:00",
+    "mavenVersion": "3.9.9",
+    "javaVersion": "21.0.7",
+    "description": "Arquivo de trava de dependências com versões exatas e hashes SHA-256 de integridade. Equivalente ao lockfile para ecossistema Maven."
+  },
+  "dependencies": {
+    "compile": [
+      {
+        "groupId": "com.formdev",
+        "artifactId": "flatlaf",
+        "version": "3.4",
+        "scope": "compile",
+        "sha256": "7DEAF7ED7D4CCA45CAE504CFC92F2760EF5076D92B6B41398DEA4FC777D1AE24"
+      }
+    ],
+    "test": [
+      {
+        "groupId": "org.junit.jupiter",
+        "artifactId": "junit-jupiter",
+        "version": "5.8.1",
+        "scope": "test",
+        "sha256": "8F1049EE24B34A10B60CD810048099F781C2658CDE2181E831496AB30A982985"
+      },
+      {
+        "groupId": "org.junit.jupiter",
+        "artifactId": "junit-jupiter-api",
+        "version": "5.8.1",
+        "scope": "test",
+        "transitive": true,
+        "sha256": "CE3374A7EFBA605E2D2B69A3FEF90134032BAB3ECC3ED8579A4871B1C2C4729C"
+      },
+      {
+        "groupId": "org.opentest4j",
+        "artifactId": "opentest4j",
+        "version": "1.2.0",
+        "scope": "test",
+        "transitive": true,
+        "sha256": "58812DE60898D976FB81EF3B62DA05C6604C18FD4A249F5044282479FC286AF2"
+      },
+      {
+        "groupId": "org.junit.platform",
+        "artifactId": "junit-platform-commons",
+        "version": "1.8.1",
+        "scope": "test",
+        "transitive": true,
+        "sha256": "FA4FA68C8BD54DD0CB49C3FCBE9B2E42F4DA6BEDBE7E7CCF2A05F1A1E609B593"
+      },
+      {
+        "groupId": "org.apiguardian",
+        "artifactId": "apiguardian-api",
+        "version": "1.1.2",
+        "scope": "test",
+        "transitive": true,
+        "sha256": "B509448AC506D607319F182537F0B35D71007582EC741832A1F111E5B5B70B38"
+      },
+      {
+        "groupId": "org.junit.jupiter",
+        "artifactId": "junit-jupiter-params",
+        "version": "5.8.1",
+        "scope": "test",
+        "transitive": true,
+        "sha256": "389B8D13A8D8872FCBD4F0EBA7B2C46AFC628419F9A1B2A3A9F93241A06A7218"
+      },
+      {
+        "groupId": "org.junit.jupiter",
+        "artifactId": "junit-jupiter-engine",
+        "version": "5.8.1",
+        "scope": "test",
+        "transitive": true,
+        "sha256": "4689BC902255A19FE98277683BA3231C094D107C54C8D35F2B6F9C97D226418E"
+      },
+      {
+        "groupId": "org.junit.platform",
+        "artifactId": "junit-platform-engine",
+        "version": "1.8.1",
+        "scope": "test",
+        "transitive": true,
+        "sha256": "702868ED7E86B9B4672EDE0F1E185E905BACA9AFAB57746A7C650BE3C7BCA047"
+      }
+    ]
+  }
+}
