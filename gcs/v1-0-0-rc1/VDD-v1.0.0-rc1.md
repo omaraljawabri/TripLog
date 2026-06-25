@@ -125,24 +125,3 @@ futuras que pretendam suportar mais de um usuário ao mesmo tempo.
 acesso ao `pom.xml`, não sabe que esse componente não deveria aparecer no artefato de produção
 (e, de fato, não aparece — confirmado manualmente na auditoria). É uma limitação do formato,
 não um erro de configuração do projeto.
-
-**Reforços de build aplicados após esta baseline (lockfile e determinismo entre SOs):**
-posteriormente à tag `v1.0.0-rc1`, o `build.sh` passou a aplicar de fato o
-`dependency-lock.json` (criado na PR #24) como portão de build: a cada execução, recalcula o
-SHA-256 de cada dependência resolvida em `~/.m2` e compara com o hash gravado no lockfile,
-falhando o build em caso de divergência — quando a ferramenta `jq` está disponível; sem ela, a
-verificação automática é pulada com aviso e o lockfile permanece como documentação manual
-nessa execução. A versão exata do JDK (patch) é só informativa: o build valida apenas a
-versão major mínima (21+) e avisa, sem bloquear, se o patch instalado divergir do registrado
-no lockfile, para não comprometer a portabilidade entre máquinas diferentes. Também foi
-adicionada uma etapa que reordena as entradas do `.jar` final em ordem alfabética com um
-timestamp único antes de calcular o hash, eliminando a dependência da ordem de travessia do
-sistema de arquivos do sistema operacional — sem essa normalização, o mesmo commit poderia
-gerar um `.jar` com hash diferente em Linux e Windows mesmo com bytecode idêntico (confirmado
-na prática: a ordem original das entradas não era alfabética).
-
-**Build em árvore suja:** o `build.sh` detecta e avisa quando há alterações não commitadas na
-árvore de trabalho (`dirty: true` no manifesto `build-info.json`), mas não bloqueia o build
-localmente — decisão deliberada para não impedir builds de desenvolvimento do dia a dia.
-Builds que representem oficialmente uma baseline, como a descrita neste documento, devem
-sempre partir de uma árvore limpa, idealmente em um commit com tag.
