@@ -23,7 +23,8 @@ set -Eeuo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT_DIR"
 
-JAR_NAME="TripLog-1.0.0.jar"
+MIN_JAVA_VERSION="21"
+MIN_MVN_VERSION="3.8.0"
 SBOM_OUT="target/sbom.json"
 HASHES_OUT="target/HASHES.sha256"
 BUILD_INFO_OUT="target/build-info.json"
@@ -52,7 +53,8 @@ usage() {
 build.sh — build completo e reprodutível do TripLog
 
 Reproduz, a partir de um ambiente limpo, em um único comando:
-  1. Validação das ferramentas necessárias (JDK, Maven)
+  1. Validação das ferramentas necessárias e de suas versões mínimas
+     (JDK ${MIN_JAVA_VERSION}+, Maven ${MIN_MVN_VERSION}+, unzip)
   2. Limpeza de artefatos de builds anteriores (target/, dependency-reduced-pom.xml)
   3. Âncora de determinismo: SOURCE_DATE_EPOCH derivado do último commit,
      TZ=UTC, LC_ALL=C e project.build.outputTimestamp do Maven — o mesmo
@@ -81,7 +83,11 @@ fi
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
-# sha256sum no Linux, shasum -a 256 no macOS
+# Remove códigos de escape ANSI (saída de `mvn -version` pode trazer cores
+# mesmo fora de um terminal interativo)
+strip_ansi() { sed -E 's/\x1b\[[0-9;]*[a-zA-Z]//g'; }
+
+# sha256sum no Linux, shasum -a 256 no macOS — só o número do hash
 sha256_of() {
     if have sha256sum; then sha256sum "$1" | awk '{print $1}'
     elif have shasum;   then shasum -a 256 "$1" | awk '{print $1}'
@@ -89,13 +95,17 @@ sha256_of() {
     fi
 }
 
-# Remove códigos de escape ANSI e escapa \ e " para uso em valores de
-# string dentro do build-info.json (saída de `mvn -version` pode trazer cores)
-json_str() {
-    printf '%s' "$1" \
-        | sed -E 's/\x1b\[[0-9;]*[a-zA-Z]//g' \
-        | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'
+# Verifica um arquivo de hashes (formato "<hash>  <caminho>") com a
+# ferramenta disponível — mesmo fallback usado em sha256_of
+sha256_check() {
+    if have sha256sum; then sha256sum -c "$1"
+    elif have shasum;   then shasum -a 256 -c "$1"
+    else fail "Nem 'sha256sum' nem 'shasum' encontrados para verificar integridade."
+    fi
 }
+
+# Escapa \ e " para uso em valores de string dentro do build-info.json
+json_str() { printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g'; }
 
 git_field() {
     if have git && git rev-parse --git-dir >/dev/null 2>&1; then
@@ -103,15 +113,44 @@ git_field() {
     fi
 }
 
+# Compara duas versões "X.Y.Z" (faltando componentes contam como 0).
+# Retorna sucesso (0) se a primeira for >= a segunda.
+version_ge() {
+    local IFS=.
+    local -a a=($1) b=($2)
+    local i n=${#b[@]}
+    for ((i = 0; i < n; i++)); do
+        local av="${a[i]:-0}" bv="${b[i]:-0}"
+        if ((10#$av > 10#$bv)); then return 0; fi
+        if ((10#$av < 10#$bv)); then return 1; fi
+    done
+    return 0
+}
+
 step "Verificando ferramentas necessárias"
-command -v java >/dev/null 2>&1 || fail "java não encontrado no PATH. Instale o JDK 21+."
-command -v mvn  >/dev/null 2>&1 || fail "mvn não encontrado no PATH. Instale o Maven 3.8+."
-JAVA_VERSION="$(java -version 2>&1 | head -n1)"
-MVN_VERSION="$(mvn -version 2>&1 | head -n1)"
+command -v java   >/dev/null 2>&1 || fail "java não encontrado no PATH. Instale o JDK ${MIN_JAVA_VERSION}+."
+command -v mvn    >/dev/null 2>&1 || fail "mvn não encontrado no PATH. Instale o Maven ${MIN_MVN_VERSION}+."
+command -v unzip  >/dev/null 2>&1 || fail "unzip não encontrado no PATH. Necessário para inspecionar o .jar gerado."
+
+JAVA_VERSION="$(java -version 2>&1 | head -n1 | strip_ansi)"
+MVN_VERSION="$(mvn -version 2>&1 | head -n1 | strip_ansi)"
 ok "java:  ${JAVA_VERSION}"
 ok "mvn:   ${MVN_VERSION}"
+
+JAVA_VERSION_NUM="$(printf '%s' "$JAVA_VERSION" | grep -oE '"[0-9]+(\.[0-9]+){0,2}' | tr -d '"' | head -n1)"
+[ -n "$JAVA_VERSION_NUM" ] || fail "não foi possível determinar a versão do JDK a partir de: ${JAVA_VERSION}"
+version_ge "$JAVA_VERSION_NUM" "$MIN_JAVA_VERSION" \
+    || fail "JDK ${JAVA_VERSION_NUM} encontrado, mas o projeto requer JDK ${MIN_JAVA_VERSION}+ (veja maven.compiler.release no pom.xml)."
+ok "versão do JDK ${JAVA_VERSION_NUM} atende ao mínimo (${MIN_JAVA_VERSION}+)"
+
+MVN_VERSION_NUM="$(printf '%s' "$MVN_VERSION" | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -n1)"
+[ -n "$MVN_VERSION_NUM" ] || fail "não foi possível determinar a versão do Maven a partir de: ${MVN_VERSION}"
+version_ge "$MVN_VERSION_NUM" "$MIN_MVN_VERSION" \
+    || fail "Maven ${MVN_VERSION_NUM} encontrado, mas o projeto requer Maven ${MIN_MVN_VERSION}+."
+ok "versão do Maven ${MVN_VERSION_NUM} atende ao mínimo (${MIN_MVN_VERSION}+)"
+
 if command -v syft >/dev/null 2>&1; then
-    SYFT_VERSION="$(syft version 2>&1 | head -n1)"
+    SYFT_VERSION="$(syft version 2>&1 | head -n1 | strip_ansi)"
     ok "syft:  ${SYFT_VERSION}"
     SYFT_AVAILABLE=1
 else
@@ -154,8 +193,14 @@ step "Compilando, executando testes e empacotando (mvn clean package)"
 mvn -B clean package "-Dproject.build.outputTimestamp=${BUILD_TS}"
 ok "build Maven concluído com sucesso"
 
-JAR_PATH="target/${JAR_NAME}"
-[ -f "$JAR_PATH" ] || fail "artefato esperado não encontrado: ${JAR_PATH}"
+# Descobre o .jar final empacotado pelo maven-shade-plugin sem fixar a
+# versão no script: o nome muda a cada bump de versão no pom.xml, e o
+# shade plugin preserva o artefato pré-shade como "original-*.jar".
+JAR_PATH=""
+while IFS= read -r f; do JAR_PATH="$f"; break; done < <(
+    find target -maxdepth 1 -name '*.jar' ! -name 'original-*' 2>/dev/null | sort
+)
+[ -n "$JAR_PATH" ] && [ -f "$JAR_PATH" ] || fail "nenhum .jar final encontrado em target/ (verifique o build do maven-shade-plugin)"
 ok "artefato gerado: ${JAR_PATH}"
 
 if [ "$SYFT_AVAILABLE" -eq 1 ]; then
@@ -168,8 +213,8 @@ fi
 
 step "Calculando hashes SHA-256 dos artefatos gerados"
 {
-    sha256sum "$JAR_PATH"
-    [ -f "$SBOM_OUT" ] && sha256sum "$SBOM_OUT"
+    printf '%s  %s\n' "$(sha256_of "$JAR_PATH")" "$JAR_PATH"
+    [ -f "$SBOM_OUT" ] && printf '%s  %s\n' "$(sha256_of "$SBOM_OUT")" "$SBOM_OUT"
 } > "$HASHES_OUT"
 ok "hashes salvos em ${HASHES_OUT}"
 cat "$HASHES_OUT"
@@ -209,7 +254,7 @@ EOF
 ok "manifesto gravado em ${BUILD_INFO_OUT}"
 
 step "Verificando integridade do build"
-sha256sum -c "$HASHES_OUT" >/dev/null || fail "hashes não correspondem aos arquivos gerados"
+sha256_check "$HASHES_OUT" >/dev/null || fail "hashes não correspondem aos arquivos gerados"
 ok "hashes verificados"
 
 MAIN_CLASS=$(unzip -p "$JAR_PATH" META-INF/MANIFEST.MF | tr -d '\r' | grep '^Main-Class:' || true)
