@@ -39,6 +39,21 @@ Aplicação desktop desenvolvida em Java com Swing, como projeto final da discip
 
    > 💡 Dica: se o duplo clique no `.jar` não funcionar, use o comando acima.
 
+## 🔁 Build reprodutível
+
+A partir da versão Maven do projeto (`pom.xml`), o build completo pode ser reproduzido em
+uma única linha de comando, a partir de um ambiente limpo:
+
+```bash
+$ ./build.sh
+```
+
+O script valida as ferramentas necessárias (JDK 21+, Maven), limpa artefatos de builds
+anteriores, compila o código, executa a suíte de 72 testes automatizados (JUnit 5),
+empacota o `.jar` final, gera um SBOM (CycloneDX, via Syft, se disponível), calcula hashes
+SHA-256 dos artefatos gerados e verifica a integridade do resultado. Use `./build.sh --help`
+para ver todas as etapas em detalhe.
+
 ## 👥 Integrantes do grupo
 
 | Matrícula | Nome                   | GitHub                                  |
