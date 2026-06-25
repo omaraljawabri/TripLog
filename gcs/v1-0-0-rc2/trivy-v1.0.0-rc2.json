@@ -1,0 +1,53 @@
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.71.2"
+  },
+  "ReportID": "019efce4-9573-7497-8979-b497a3928601",
+  "CreatedAt": "2026-06-25T00:48:19.44330484-03:00",
+  "ArtifactName": ".",
+  "ArtifactType": "filesystem",
+  "Results": [
+    {
+      "Target": "pom.xml",
+      "Class": "lang-pkgs",
+      "Type": "pom",
+      "Packages": [
+        {
+          "ID": "com.triplog:TripLog:1.0.0::201bdd50",
+          "Name": "com.triplog:TripLog",
+          "Identifier": {
+            "PURL": "pkg:maven/com.triplog/TripLog@1.0.0",
+            "UID": "6841c98eb17eed7f"
+          },
+          "Version": "1.0.0",
+          "Relationship": "root",
+          "DependsOn": [
+            "com.formdev:flatlaf:3.4::9d2c9ecb"
+          ],
+          "AnalyzedBy": "pom"
+        },
+        {
+          "ID": "com.formdev:flatlaf:3.4::9d2c9ecb",
+          "Name": "com.formdev:flatlaf",
+          "Identifier": {
+            "PURL": "pkg:maven/com.formdev/flatlaf@3.4",
+            "UID": "13f917132ff27b70"
+          },
+          "Version": "3.4",
+          "Licenses": [
+            "Apache-2.0"
+          ],
+          "Relationship": "direct",
+          "Locations": [
+            {
+              "StartLine": 19,
+              "EndLine": 23
+            }
+          ],
+          "AnalyzedBy": "pom"
+        }
+      ]
+    }
+  ]
+}
