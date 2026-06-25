@@ -28,6 +28,7 @@ MIN_MVN_VERSION="3.8.0"
 SBOM_OUT="target/sbom.json"
 HASHES_OUT="target/HASHES.sha256"
 BUILD_INFO_OUT="target/build-info.json"
+LOCKFILE="dependency-lock.json"
 
 if [ -t 1 ]; then
     C_BLUE='\033[1;34m'; C_GREEN='\033[1;32m'; C_RED='\033[1;31m'; C_YELLOW='\033[1;33m'; C_RESET='\033[0m'
@@ -59,20 +60,29 @@ Reproduz, a partir de um ambiente limpo, em um único comando:
   3. Âncora de determinismo: SOURCE_DATE_EPOCH derivado do último commit,
      TZ=UTC, LC_ALL=C e project.build.outputTimestamp do Maven — o mesmo
      commit sempre produz o mesmo .jar, em qualquer máquina ou data de build
-  4. Compilação + execução da suíte de testes (JUnit 5) + empacotamento (.jar)
-  5. Geração de SBOM em CycloneDX via Syft, se a ferramenta estiver instalada
+  4. Compilação (com --strict-checksums) + testes (JUnit 5) + empacotamento (.jar)
+  5. Verificação das dependências contra ${LOCKFILE} (via jq, se disponível):
+     recalcula o SHA-256 de cada dependência resolvida e falha o build em
+     divergência; também avisa (sem falhar) se o patch do JDK instalado
+     diferir do registrado no lockfile
+  6. Normalização determinística da ordem de entradas do .jar (ordem
+     alfabética fixa + timestamp único), para que o mesmo commit produza o
+     mesmo .jar em qualquer sistema operacional — com smoke test de execução
+     quando há um display gráfico disponível
+  7. Geração de SBOM em CycloneDX via Syft, se a ferramenta estiver instalada
      (saída em ${SBOM_OUT}; etapa pulada com aviso se o Syft não estiver no PATH)
-  6. Cálculo de hashes SHA-256 dos artefatos gerados (${HASHES_OUT}) e
+  8. Cálculo de hashes SHA-256 dos artefatos gerados (${HASHES_OUT}) e
      gravação de um manifesto do build com a proveniência (${BUILD_INFO_OUT}):
      commit, branch, tag/describe, árvore limpa ou suja, versões das ferramentas
-  7. Verificação de integridade: manifest do .jar, ausência de classes de
+  9. Verificação de integridade: manifest do .jar, ausência de classes de
      teste no artefato final, e conferência dos hashes calculados
 
 Uso:
   ./build.sh           Executa o build completo
   ./build.sh --help    Mostra esta ajuda
 
-Pré-requisitos: JDK 21+, Maven 3.8+. Syft é opcional (apenas para o SBOM).
+Pré-requisitos: JDK 21+, Maven 3.8+. Syft e jq são opcionais (SBOM e
+verificação automática do dependency-lock.json, respectivamente).
 EOF
 }
 
@@ -117,6 +127,48 @@ version_ge() {
         if ((10#$av < 10#$bv)); then return 1; fi
     done
     return 0
+}
+
+verify_lockfile() {
+    if [ ! -f "$LOCKFILE" ]; then
+        warn "${LOCKFILE} não encontrado — pulando verificação automática do lockfile."
+        return
+    fi
+    if ! have jq; then
+        warn "jq não encontrado no PATH — ${LOCKFILE} não será verificado automaticamente nesta execução (permanece como documentação manual)."
+        return
+    fi
+
+    local lock_java
+    lock_java="$(jq -r '.meta.javaVersion // empty' "$LOCKFILE")"
+    if [ -n "$lock_java" ] && [ "$lock_java" != "$JAVA_VERSION_NUM" ]; then
+        warn "JDK instalado (${JAVA_VERSION_NUM}) difere do registrado em ${LOCKFILE} (${lock_java}) — informativo, não bloqueia o build."
+    fi
+
+    local m2_repo="${HOME}/.m2/repository"
+    local checked=0 mismatches=0 details=""
+    while IFS=$'\t' read -r groupId artifactId version expectedHash; do
+        [ -n "$groupId" ] || continue
+        checked=$((checked + 1))
+        local g_path="${groupId//.//}"
+        local jar_path="${m2_repo}/${g_path}/${artifactId}/${version}/${artifactId}-${version}.jar"
+        if [ ! -f "$jar_path" ]; then
+            mismatches=$((mismatches + 1))
+            details+=$'\n'"  - ${groupId}:${artifactId}:${version}: artefato não encontrado em ${jar_path}"
+            continue
+        fi
+        local actualHash
+        actualHash="$(sha256_of "$jar_path")"
+        if [ "${actualHash^^}" != "${expectedHash^^}" ]; then
+            mismatches=$((mismatches + 1))
+            details+=$'\n'"  - ${groupId}:${artifactId}:${version}: hash divergente (esperado ${expectedHash}, obtido ${actualHash})"
+        fi
+    done < <(jq -r '.dependencies | to_entries[] | .value[] | [.groupId, .artifactId, .version, .sha256] | @tsv' "$LOCKFILE")
+
+    if [ "$mismatches" -gt 0 ]; then
+        fail "${LOCKFILE}: ${mismatches} divergência(s) encontrada(s):${details}"
+    fi
+    ok "lockfile verificado: ${checked} dependência(s) conferem com ${LOCKFILE}"
 }
 
 step "Verificando ferramentas necessárias"
@@ -182,8 +234,11 @@ rm -rf target dependency-reduced-pom.xml
 ok "target/ e dependency-reduced-pom.xml removidos"
 
 step "Compilando, executando testes e empacotando (mvn clean package)"
-mvn -B clean package "-Dproject.build.outputTimestamp=${BUILD_TS}"
+mvn -B -C clean package "-Dproject.build.outputTimestamp=${BUILD_TS}"
 ok "build Maven concluído com sucesso"
+
+step "Verificando dependências contra ${LOCKFILE}"
+verify_lockfile
 
 JAR_PATH=""
 while IFS= read -r f; do JAR_PATH="$f"; break; done < <(
@@ -191,6 +246,39 @@ while IFS= read -r f; do JAR_PATH="$f"; break; done < <(
 )
 [ -n "$JAR_PATH" ] && [ -f "$JAR_PATH" ] || fail "nenhum .jar final encontrado em target/ (verifique o build do maven-shade-plugin)"
 ok "artefato gerado: ${JAR_PATH}"
+
+step "Normalizando ordem de entradas do .jar (determinismo entre sistemas operacionais)"
+
+JAR_EXTRACT_DIR="$(mktemp -d)"
+( cd "$JAR_EXTRACT_DIR" && jar --extract --file="$ROOT_DIR/$JAR_PATH" )
+
+JAR_FILELIST="$(mktemp)"
+{
+    printf '%s\n' "META-INF/MANIFEST.MF"
+    ( cd "$JAR_EXTRACT_DIR" && find . -type f ! -path './META-INF/MANIFEST.MF' | sed 's|^\./||' | LC_ALL=C sort )
+} > "$JAR_FILELIST"
+
+JAR_REPACKED="${JAR_PATH}.repacked"
+( cd "$JAR_EXTRACT_DIR" && jar --create --file="$ROOT_DIR/$JAR_REPACKED" --no-manifest "--date=${BUILD_TS}" "@${JAR_FILELIST}" )
+mv -f "$JAR_REPACKED" "$JAR_PATH"
+rm -rf "$JAR_EXTRACT_DIR" "$JAR_FILELIST"
+ok "entradas do .jar reordenadas deterministicamente (ordem alfabética, timestamp único)"
+
+if [ -n "${DISPLAY:-}" ]; then
+    ( java -jar "$JAR_PATH" >/dev/null 2>&1 & SMOKE_PID=$!
+      sleep 2
+      if kill -0 "$SMOKE_PID" 2>/dev/null; then
+          kill "$SMOKE_PID" 2>/dev/null
+          wait "$SMOKE_PID" 2>/dev/null
+          exit 0
+      else
+          wait "$SMOKE_PID"
+      fi
+    ) || fail "o .jar reempacotado não iniciou corretamente (smoke test falhou)"
+    ok "smoke test: .jar reempacotado inicia corretamente"
+else
+    warn "nenhum DISPLAY detectado (ambiente headless/CI) — smoke test de execução do .jar pulado."
+fi
 
 if [ "$SYFT_AVAILABLE" -eq 1 ]; then
     step "Gerando SBOM (Syft, CycloneDX JSON)"
